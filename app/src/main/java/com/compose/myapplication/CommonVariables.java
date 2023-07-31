@@ -55,7 +55,6 @@ public class CommonVariables {
     public Bitmap image;
     public PuzzlePiece[] puzzlePieces;
     public PuzzleSlot[] puzzleSlots;
-    public Button mNextButton;
     public float volume;
     public MySoundPool mySoundPool;
     public double dimensions;
@@ -63,7 +62,6 @@ public class CommonVariables {
     public int[] ys, xs;
     public int puzzlesSolved = 0;
     public boolean isLogging = false;
-    public ImageButton devartButton, wordpressLinkButton;
     private static final String TAG = "puzzleLog";
     public boolean isImageLoaded;
     public boolean isPuzzleSplitCorrectly;
@@ -81,10 +79,6 @@ public class CommonVariables {
     public long twentyfiveRecordSolveTime = 0;
     public long thirtysixRecordsSolveTime = 0;
     public long fourtynineRecordsSolveTime = 0;
-    public TextView textViewSolve;
-    public CoordinatorLayout coordinatorLayout;
-    public ImageButton saveMusicButton;
-    public ImageButton saveImageButton;
 
     public static CommonVariables getInstance() {
         if (instance == null)
@@ -272,167 +266,5 @@ public class CommonVariables {
         for (int i = 0; i < pieces; i++) {
             slotOrder[i] = i;
         }
-    }
-
-    /**
-     * Run a thread on the UI to hide the UI views.
-     */
-    public void hideButtons(Context context) {
-        if (isLogging) Log.d(TAG, "hideButtons CommonVariables");
-
-        Activity act = (Activity) context;
-        act.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if (mNextButton != null
-                        && mNextButton.getVisibility() == View.VISIBLE) {
-                    mNextButton.setVisibility(View.INVISIBLE);
-                }
-                if (devartButton != null
-                        && devartButton.getVisibility() == View.VISIBLE) {
-                    devartButton.setVisibility(View.INVISIBLE);
-                }
-                if (wordpressLinkButton != null
-                        && wordpressLinkButton.getVisibility() == View.VISIBLE) {
-                    wordpressLinkButton.setVisibility(View.INVISIBLE);
-                }
-                if (saveImageButton != null
-                        && saveImageButton.getVisibility() == View.VISIBLE) {
-                    saveImageButton.setVisibility(View.INVISIBLE);
-                }
-                if (saveMusicButton != null
-                        && saveMusicButton.getVisibility() == View.VISIBLE) {
-                    saveMusicButton.setVisibility(View.INVISIBLE);
-                }
-                if (textViewSolve != null
-                        && textViewSolve.getVisibility() == View.VISIBLE) {
-                    textViewSolve.setVisibility(View.INVISIBLE);
-                }
-            }
-        });
-    }
-
-
-    /**
-     * Run a thread on the UI to toggle the visibility of the UI views.
-     */
-    public void toggleUIOverlay(Context context) {
-        if (isLogging)
-            Log.d(TAG, "toggleUIOverlay CommonVariables");
-
-        Activity act = (Activity) context;
-        act.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if (mNextButton != null)
-                    if (mNextButton.getVisibility() == View.VISIBLE)
-                        mNextButton.setVisibility(View.INVISIBLE);
-                    else {
-                        mNextButton.setVisibility(View.VISIBLE);
-                        mNextButton.bringToFront();
-                    }
-
-                if (devartButton != null)
-                    if (devartButton.getVisibility() == View.VISIBLE)
-                        devartButton
-                                .setVisibility(View.INVISIBLE);
-                    else {
-                        devartButton
-                                .setVisibility(View.VISIBLE);
-                        devartButton.bringToFront();
-                    }
-
-                if (wordpressLinkButton != null)
-                    if (wordpressLinkButton
-                            .getVisibility() == View.VISIBLE)
-                        wordpressLinkButton
-                                .setVisibility(View.INVISIBLE);
-                    else {
-                        wordpressLinkButton
-                                .setVisibility(View.VISIBLE);
-                        wordpressLinkButton.bringToFront();
-                    }
-
-                if (saveMusicButton != null)
-                    if (saveMusicButton
-                            .getVisibility() == View.VISIBLE)
-                        saveMusicButton
-                                .setVisibility(View.INVISIBLE);
-                    else {
-                        saveMusicButton
-                                .setVisibility(View.VISIBLE);
-                        saveMusicButton.bringToFront();
-                    }
-
-                if (saveImageButton != null)
-                    if (saveImageButton
-                            .getVisibility() == View.VISIBLE)
-                        saveImageButton
-                                .setVisibility(View.INVISIBLE);
-                    else {
-                        saveImageButton
-                                .setVisibility(View.VISIBLE);
-                        saveImageButton.bringToFront();
-                    }
-
-                if (textViewSolve != null)
-                    if (textViewSolve
-                            .getVisibility() == View.VISIBLE)
-                        textViewSolve
-                                .setVisibility(View.INVISIBLE);
-                    else {
-                        textViewSolve
-                                .setVisibility(View.VISIBLE);
-                        textViewSolve.bringToFront();
-                    }
-            }
-        });
-    }
-
-
-    /**
-     * Run a thread on the UI to show the UI views.
-     */
-    public void showButtons(Context context) {
-        if (isLogging) Log.d(TAG, "showButtons CommonVariables");
-
-        Activity act = (Activity) context;
-        act.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-
-                if (mNextButton != null
-                        && mNextButton.getVisibility() == View.INVISIBLE) {
-                    mNextButton.setVisibility(View.VISIBLE);
-                    mNextButton.bringToFront();
-                }
-
-                if (devartButton != null
-                        && devartButton.getVisibility() == View.INVISIBLE) {
-                    devartButton.setVisibility(View.VISIBLE);
-                    devartButton.bringToFront();
-                }
-
-                if (wordpressLinkButton != null
-                        && wordpressLinkButton.getVisibility() == View.INVISIBLE) {
-                    wordpressLinkButton.setVisibility(View.VISIBLE);
-                    wordpressLinkButton.bringToFront();
-                }
-
-                if (saveImageButton != null
-                        && saveImageButton.getVisibility() == View.INVISIBLE) {
-                    saveImageButton.setVisibility(View.VISIBLE);
-                    saveImageButton.bringToFront();
-                }
-
-                if (saveMusicButton != null
-                        && saveMusicButton.getVisibility() == View.INVISIBLE) {
-                    saveMusicButton.setVisibility(View.VISIBLE);
-                    saveMusicButton.bringToFront();
-                }
-            }
-        });
     }
 }

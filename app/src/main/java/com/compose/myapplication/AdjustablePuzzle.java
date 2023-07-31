@@ -579,4 +579,8 @@ public class AdjustablePuzzle {
             common.isPuzzleSolved = true;
         }
     }
+
+    public void updatePhysics() {
+
+    }
 }

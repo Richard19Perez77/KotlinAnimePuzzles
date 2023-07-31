@@ -13,6 +13,11 @@ import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {
 
+    companion object{
+        const val WRITE_EXTERNAL_STORAGE_IMAGE = 1
+        const val WRITE_EXTERNAL_STORAGE_MUSIC = 2
+    }
+
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
 

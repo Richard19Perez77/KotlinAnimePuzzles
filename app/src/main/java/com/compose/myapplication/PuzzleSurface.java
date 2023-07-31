@@ -21,6 +21,8 @@ import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A class to hold the surface of the puzzle and the thread for updating physics
  * and drawing.
@@ -41,6 +43,9 @@ public class PuzzleSurface extends SurfaceView implements
     public PuzzleSurface ps;
     public String defaultPuzzleSize = "2";
     public Context context;
+
+    @NotNull
+    public FirstFragment fragment;
 
     public PuzzleSurface(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -69,36 +74,8 @@ public class PuzzleSurface extends SurfaceView implements
         transPaint.setStyle(Paint.Style.FILL);
 
         fullPaint = new Paint();
-        puzzleUpdateAndDraw = new PuzzleUpdateAndDraw(holder, context);
+        puzzleUpdateAndDraw = new PuzzleUpdateAndDraw(holder);
 
-    }
-
-    /**
-     * Prepare dialog for getting a new image, let the user know the deviant art link is updating as new images are loaded.
-     */
-    public void nextImage() {
-        common.hideButtons(context);
-        common.isImageLoaded = false;
-        puzzle.getNewImageLoadedScaledDivided();
-
-        Animation animation = AnimationUtils.loadAnimation(context, R.anim.fade_out);
-        Animation.AnimationListener animationListener = new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                common.textViewSolve.setVisibility(View.INVISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
-            }
-        };
-        animation.setAnimationListener(animationListener);
-        common.textViewSolve.setAnimation(animation);
     }
 
     /**
@@ -148,7 +125,7 @@ public class PuzzleSurface extends SurfaceView implements
     public void surfaceCreated(SurfaceHolder holder) {
         if (common.isLogging) Log.d(TAG, "surfaceCreated PuzzleSurface");
 
-        puzzleUpdateAndDraw = new PuzzleUpdateAndDraw(holder, context);
+        puzzleUpdateAndDraw = new PuzzleUpdateAndDraw(holder);
     }
 
     public void surfaceDestroyed(SurfaceHolder holder) {
@@ -176,7 +153,7 @@ public class PuzzleSurface extends SurfaceView implements
 
             if (common.isWindowInFocus && common.isImageLoaded) {
                 if (common.isPuzzleSolved) {
-                    common.toggleUIOverlay(context);
+                    fragment.toggleUIOverlay();
                     return false;
                 } else {
                     return puzzle.onTouchEvent(event);
@@ -198,7 +175,7 @@ public class PuzzleSurface extends SurfaceView implements
         puzzle = new AdjustablePuzzle(ps);
         puzzle.initPieces(sides);
         puzzle.getNewImageLoadedScaledDivided();
-        common.hideButtons(context);
+        // hideButtons(context);
     }
 
     /**
@@ -211,7 +188,7 @@ public class PuzzleSurface extends SurfaceView implements
         puzzle = new AdjustablePuzzle(ps);
         puzzle.initPieces(3);
         puzzle.getNewImageLoadedScaledDivided();
-        common.hideButtons(context);
+        // hideButtons(context);
     }
 
     /**
@@ -225,44 +202,7 @@ public class PuzzleSurface extends SurfaceView implements
         int sides = (int) common.dimensions;
         puzzle.initPieces(sides);
         puzzle.getPreviousImageLoadedScaledDivided();
-        common.hideButtons(context);
-    }
-
-    /**
-     * Load a new window for the internet link provided.
-     */
-    public void devartActivity() {
-        Activity act = (Activity) context;
-        AlertDialog.Builder builder = new AlertDialog.Builder(act);
-        builder.setTitle(common.res.getString(R.string.deviant_title));
-        builder.setMessage(common.data.artworks[common.currentPuzzleImagePosition].titleOfArtist + common.res.getString(R.string.deviant_message))
-                .setPositiveButton(common.res.getString(R.string.continue_desc), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        common.hideButtons(context);
-                        Intent intent2 = new Intent(Intent.ACTION_VIEW);
-                        intent2.setData(Uri.parse(common.data.artworks[common.currentPuzzleImagePosition].urlOfArtist));
-                        common.blogLinksTraversed++;
-                        context.startActivity(intent2);
-                    }
-                })
-                .setNegativeButton(common.res.getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        //close dialog
-                    }
-                });
-        builder.show();
-    }
-
-    /**
-     * Load a new window for the internet link provided.
-     */
-    public void wordpressActivity() {
-        common.hideButtons(context);
-        Intent intent1 = new Intent(Intent.ACTION_VIEW);
-        intent1.setData(Uri.parse(context
-                .getString(R.string.wordpress_link)));
-        common.blogLinksTraversed++;
-        context.startActivity(intent1);
+        // hideButtons(context);
     }
 
     public void cleanUp() {
@@ -414,10 +354,8 @@ public class PuzzleSurface extends SurfaceView implements
 
         public final SurfaceHolder mSurfaceHolder;
 
-        public PuzzleUpdateAndDraw(SurfaceHolder surfaceHolder,
-                                   Context context) {
+        public PuzzleUpdateAndDraw(SurfaceHolder surfaceHolder) {
             mSurfaceHolder = surfaceHolder;
-            context = context;
         }
 
         /**
@@ -427,12 +365,13 @@ public class PuzzleSurface extends SurfaceView implements
             if (common.isLogging)
                 Log.d(TAG, "updateAndDraw PuzzleSurface");
 
+            fragment.updatePhysics();
+
             Canvas c = null;
             try {
                 c = mSurfaceHolder.lockCanvas(null);
                 if (c != null) {
                     synchronized (mSurfaceHolder) {
-                        updatePhysics();
                         doDraw(c);
                     }
                 }
@@ -450,36 +389,7 @@ public class PuzzleSurface extends SurfaceView implements
         /**
          * The UI is updated on solve of a puzzle where the buttons are shown.
          */
-        private void updatePhysics() {
-            if (common.isLogging) Log.d(TAG, "updatePhysics PuzzleSurface");
 
-            if (common.isPuzzleSolved) {
-                final String solveTime = "Solve time = " + puzzle.getSolveTime() + " secs.";
-                common.textViewSolve.postDelayed(() -> {
-                    common.textViewSolve.setText(solveTime);
-                    common.textViewSolve.setVisibility(View.VISIBLE);
-                    Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
-                    animation.setAnimationListener(new Animation.AnimationListener() {
-                        @Override
-                        public void onAnimationStart(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animation animation) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animation animation) {
-
-                        }
-                    });
-                    common.textViewSolve.setAnimation(animation);
-                }, 0);
-                common.showButtons(context);
-            }
-        }
 
         /**
          * Draw may include a shadow piece to replace a moving piece.

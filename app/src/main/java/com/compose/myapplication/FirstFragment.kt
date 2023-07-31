@@ -1,23 +1,46 @@
 package com.compose.myapplication
 
+import android.app.Activity
 import android.content.BroadcastReceiver
+import android.content.ContentResolver
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.media.AudioManager
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.compose.myapplication.databinding.FragmentFirstBinding
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.io.InputStream
+import java.io.OutputStream
 
 
 /**
@@ -25,19 +48,22 @@ import com.compose.myapplication.databinding.FragmentFirstBinding
  */
 class FirstFragment : Fragment() {
 
-    val TAG = "com.updated.puzzles.PuzzleFragment"
+    companion object {
+        const val PUZZLE_LOG = "puzzleLog"
+        const val TAG = "com.updated.puzzles.PuzzleFragment"
+    }
 
     // lateinit var myMediaPlayer: MyMediaPlayer
     // lateinit var mySoundPool: MySoundPool
     lateinit var sharedpreferences: SharedPreferences
     lateinit var noisyAudioStreamReceiver: NoisyAudioStreamReceiver
-    var common = CommonVariables.getInstance()
-    private val PUZZLE_LOG = "puzzleLog"
     lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
+    var common = CommonVariables.getInstance()
 
     private val intentFilter = IntentFilter(
         AudioManager.ACTION_AUDIO_BECOMING_NOISY
     )
+
     private fun startPlayback() {
         if (common.isLogging) Log.d(PUZZLE_LOG, "startPlayback NoisyAudioStreamReceiver")
         activity?.registerReceiver(noisyAudioStreamReceiver, intentFilter)
@@ -70,14 +96,6 @@ class FirstFragment : Fragment() {
         }
     }
 
-    override fun onCreateContextMenu(
-        menu: ContextMenu,
-        v: View,
-        menuInfo: ContextMenu.ContextMenuInfo?
-    ) {
-        super.onCreateContextMenu(menu, v, menuInfo)
-    }
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.main_puzzle, menu)
@@ -87,30 +105,31 @@ class FirstFragment : Fragment() {
         when (item.itemId) {
             R.id.new_puzzle -> {
                 binding.puzzle.newPuzzle()
-                return true;
+                return true
             }
+
             R.id.music_toggle -> {
                 binding.puzzle.toggleMusic()
                 return true
             }
+
             R.id.set_toggle -> {
                 binding.puzzle.toggleSetSound()
                 return true
             }
+
             R.id.border_toggle -> {
                 binding.puzzle.toggleBorder()
                 return true
             }
+
             R.id.win_toggle -> {
                 binding.puzzle.toggleWinSound()
-                return true;
+                return true
             }
+
             else -> return super.onOptionsItemSelected(item)
         }
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
@@ -126,38 +145,288 @@ class FirstFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
 
-        common.devartButton = binding.devartButton
+        requestPermissionLauncher = registerForActivityResult<String, Boolean>(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+            if (isGranted) {
+
+            } else {
+                // Explain to the user that the feature is unavailable because the
+                // feature requires a permission that the user has denied. At the
+                // same time, respect the user's decision. Don't link to system
+                // settings in an effort to convince the user to change their
+                // decision.
+            }
+        }
+
         binding.devartButton.setOnClickListener {
+            hideButtons()
+            val intent2 = Intent(Intent.ACTION_VIEW)
+            intent2.data =
+                Uri.parse(common.data.artworks[common.currentPuzzleImagePosition].urlOfArtist)
+            common.blogLinksTraversed++
+            startActivity(intent2)
         }
 
-        common.wordpressLinkButton = binding.wordpressButton
         binding.wordpressButton.setOnClickListener {
+            hideButtons()
+            val intent1 = Intent(Intent.ACTION_VIEW)
+            intent1.data = Uri.parse(context?.getString(R.string.wordpress_link))
+            common.blogLinksTraversed++
+            context?.startActivity(intent1)
         }
 
-        common.mNextButton = binding.nextButton
         binding.nextButton.setOnClickListener {
+            hideButtons()
+            common.isImageLoaded = false
+            binding.puzzle.puzzle.getNewImageLoadedScaledDivided()
+
+            val animation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
+            val animationListener: Animation.AnimationListener =
+                object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation) {}
+                    override fun onAnimationEnd(animation: Animation) {
+                        binding.scoreText.visibility = View.INVISIBLE
+                    }
+
+                    override fun onAnimationRepeat(animation: Animation) {}
+                }
+            animation.setAnimationListener(animationListener)
+            binding.scoreText.animation = animation
         }
 
-        common.saveImageButton = binding.saveImageButton
         binding.saveImageButton.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val coroutineScope = CoroutineScope(Dispatchers.Main)
+                coroutineScope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        permissionCheckSaveImage();
+                    }
+                    if (result) showToast("Success!") else showToast("Error!")
+                }
+            } else {
+                saveImage();
+            }
         }
 
-        common.saveMusicButton = binding.saveMusicButton
         binding.saveMusicButton.setOnClickListener {
-
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val coroutineScope = CoroutineScope(Dispatchers.Main)
+                coroutineScope.launch {
+                    val result = withContext(Dispatchers.IO) {
+                        permissionCheckSaveMusic();
+                    }
+                    if (result) showToast("Success!") else showToast("Error!")
+                }
+            } else {
+                marshmallowSaveMusic();
+            }
         }
 
-        common.textViewSolve = binding.scoreText
-
+        binding.puzzle.fragment = this;
     }
 
-    override fun onViewStateRestored(savedInstanceState: Bundle?) {
-        super.onViewStateRestored(savedInstanceState)
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    suspend fun permissionCheckSaveImage(): Boolean = withContext(Dispatchers.IO) {
+        var inputStream: InputStream? = null
+        var out: OutputStream? = null
+        try {
+            var cachePath = ""
+            val path = File(requireContext().externalCacheDir, "music")
+            path.mkdirs() // don't forget to make the directory
+            val file = File(path, "\$fileName")
+            val stream = FileOutputStream(file)
+            val inputStream1: InputStream =
+                requireContext().resources.openRawResource(Data.TRACK_01)
+            val data = ByteArray(inputStream1.available())
+            inputStream1.read(data)
+            stream.write(data)
+            inputStream1.close()
+            stream.close()
+            cachePath = file.absolutePath
+            val cachedImgFile = File(cachePath)
+            val resolver = requireContext().contentResolver
+            val cachedImgUrl = cachedImgFile.toURI().toURL()
+            val name = "track03"
+            val contentValues = ContentValues()
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mpeg")
+            contentValues.put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_DOWNLOADS
+            )
+            val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
+            if (uri != null) {
+                inputStream = cachedImgUrl.openStream()
+                out = resolver.openOutputStream(uri)
+                inputStream.transferTo(out)
+                inputStream.close()
+                assert(out != null)
+                out!!.close()
+            }
+            cachedImgFile.delete()
+            common.musicSaved++
+            return@withContext true
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+        } finally {
+            try {
+                inputStream?.close()
+            } catch (e: IOException) { /* handle */
+            }
+            try {
+                out?.close()
+            } catch (e: IOException) { /*handle */
+            }
+
+        }
+        return@withContext false
+    }
+
+    private fun saveImage() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestReadWritePermission(MainActivity.WRITE_EXTERNAL_STORAGE_IMAGE)
+        } else {
+            SavePhoto(context, common.currentPuzzleImagePosition)
+        }
+    }
+
+    private fun requestReadWritePermission(returnCode: Int) {
+        val activity = context as Activity?
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                activity!!,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
+            Snackbar.make(
+                binding.coordinatorLayout, "Allow saving with permission.",
+                Snackbar.LENGTH_INDEFINITE
+            ).setAction("OK",
+                View.OnClickListener { view: View? ->
+                    ActivityCompat.requestPermissions(
+                        activity,
+                        arrayOf<String>(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                        returnCode
+                    )
+                }).show()
+        } else {
+            ActivityCompat.requestPermissions(
+                activity,
+                arrayOf<String>(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                returnCode
+            )
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    suspend fun permissionCheckSaveMusic(): Boolean = withContext(Dispatchers.Default) {
+        var inputStream: InputStream? = null
+        var out: OutputStream? = null
+        try {
+            var cachePath = ""
+            val path: File = File(context?.externalCacheDir, "music")
+            path.mkdirs() // don't forget to make the directory
+            val file = File(path, "\$fileName")
+            val stream = FileOutputStream(file)
+            val `is` = context?.resources?.openRawResource(Data.TRACK_01)
+            val data = ByteArray(`is`?.available()!!)
+            `is`.read(data)
+            stream.write(data)
+            `is`.close()
+            stream.close()
+            cachePath = file.absolutePath
+            val cachedImgFile = File(cachePath)
+            val resolver: ContentResolver = context?.contentResolver!!
+            val cachedImgUrl = cachedImgFile.toURI().toURL()
+            val name = "track03"
+            val contentValues = ContentValues()
+            contentValues.put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+            contentValues.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mpeg")
+            contentValues.put(
+                MediaStore.MediaColumns.RELATIVE_PATH,
+                Environment.DIRECTORY_DOWNLOADS
+            )
+            val uri =
+                resolver.insert(
+                    MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+                    contentValues
+                )
+            if (uri != null) {
+                inputStream = cachedImgUrl.openStream()
+                out = resolver.openOutputStream(uri)
+                inputStream.transferTo(out)
+                inputStream.close()
+                assert(out != null)
+                out!!.close()
+            }
+            cachedImgFile.delete()
+            CommonVariables.getInstance().musicSaved++
+            return@withContext true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        } finally {
+            try {
+                inputStream?.close()
+            } catch (e: IOException) { /* handle */
+            }
+            try {
+                out?.close()
+            } catch (e: IOException) { /*handle */
+            }
+        }
+        return@withContext false
+    }
+
+    private lateinit var toast: Toast
+    private fun showToast(message: String) {
+        // Create and show toast for save photo
+        toast = Toast.makeText(activity, message, Toast.LENGTH_SHORT)
+        toast.show()
+    }
+
+
+    private fun marshmallowSaveMusic() {
+        if (ActivityCompat.checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestReadWritePermission(MainActivity.WRITE_EXTERNAL_STORAGE_MUSIC)
+        } else {
+            val intent = Intent(context, SaveMusicService::class.java)
+            context?.startService(intent)
+        }
+    }
+
+    private fun hideButtons() {
+        if (binding.scoreText.visibility == View.VISIBLE) {
+            binding.scoreText.visibility = View.INVISIBLE
+        }
+        if (binding.nextButton.visibility == View.VISIBLE) {
+            binding.nextButton.visibility = View.INVISIBLE
+        }
+        if (binding.devartButton.visibility == View.VISIBLE) {
+            binding.devartButton.visibility = View.INVISIBLE
+        }
+        if (binding.wordpressButton.visibility == View.VISIBLE) {
+            binding.wordpressButton.visibility = View.INVISIBLE
+        }
+        if (binding.saveMusicButton.visibility == View.VISIBLE) {
+            binding.saveMusicButton.visibility = View.INVISIBLE
+        }
+        if (binding.saveImageButton.visibility == View.VISIBLE) {
+            binding.saveImageButton.visibility = View.INVISIBLE
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        getSharedPrefs();
+        getSharedPrefs()
     }
 
     override fun onResume() {
@@ -165,7 +434,7 @@ class FirstFragment : Fragment() {
     }
 
     /**
-     * Helper method to get total of all ints from 0 to n;
+     * Helper method to get total of all ints from 0 to n
      *
      * @param n
      * @return
@@ -191,7 +460,7 @@ class FirstFragment : Fragment() {
             posImage = sharedpreferences.getInt(
                 getString(R.string.IMAGENUMBER), 0
             )
-            if (posImage >= 0 || posImage < common.data.artworks.size) {
+            if (posImage >= 0 && posImage < common.data.artworks.size) {
                 isValid = true
             }
         } else {
@@ -422,5 +691,108 @@ class FirstFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    public fun toggleUIOverlay() {
+        if (common.isLogging)
+            Log.d(TAG, "toggleUIOverlay CommonVariables")
+
+        if (binding.nextButton.visibility == View.VISIBLE)
+            binding.nextButton.visibility = View.INVISIBLE
+        else {
+            binding.nextButton.visibility = View.VISIBLE
+            binding.nextButton.bringToFront()
+        }
+
+        if (binding.devartButton.visibility == View.VISIBLE)
+            binding.devartButton.visibility = View.INVISIBLE
+        else {
+            binding.devartButton.visibility = View.VISIBLE
+            binding.devartButton.bringToFront()
+        }
+
+        if (binding.wordpressButton
+                .visibility == View.VISIBLE
+        )
+            binding.wordpressButton.visibility = View.INVISIBLE
+        else {
+            binding.wordpressButton.visibility = View.VISIBLE
+            binding.wordpressButton.bringToFront()
+        }
+
+        if (binding.saveImageButton
+                .visibility == View.VISIBLE
+        )
+            binding.saveImageButton.visibility = View.INVISIBLE
+        else {
+            binding.saveImageButton.visibility = View.VISIBLE
+            binding.saveImageButton.bringToFront()
+        }
+
+        if (binding.saveMusicButton
+                .visibility == View.VISIBLE
+        )
+            binding.saveMusicButton.visibility = View.INVISIBLE
+        else {
+            binding.saveMusicButton.visibility = View.VISIBLE
+            binding.saveMusicButton.bringToFront()
+        }
+
+        if (binding.scoreText
+                .visibility == View.VISIBLE
+        )
+            binding.scoreText.visibility = View.INVISIBLE
+        else {
+            binding.scoreText.visibility = View.VISIBLE
+            binding.scoreText.bringToFront()
+        }
+    }
+
+    /**
+     * Run a thread on the UI to show the UI views.
+     */
+    private fun showButtons() {
+        if (common.isLogging) Log.d(TAG, "showButtons CommonVariables")
+        if (binding.nextButton.visibility == View.INVISIBLE) {
+            binding.nextButton.visibility = View.VISIBLE
+            binding.nextButton.bringToFront()
+        }
+        if (binding.devartButton.visibility == View.INVISIBLE) {
+            binding.devartButton.visibility = View.VISIBLE
+            binding.devartButton.bringToFront()
+        }
+        if (binding.wordpressButton.visibility == View.INVISIBLE) {
+            binding.wordpressButton.visibility = View.VISIBLE
+            binding.wordpressButton.bringToFront()
+        }
+        if (binding.saveImageButton.visibility == View.INVISIBLE) {
+            binding.saveImageButton.visibility = View.VISIBLE
+            binding.saveImageButton.bringToFront()
+        }
+        if (binding.saveMusicButton.visibility == View.INVISIBLE) {
+            binding.saveMusicButton.visibility = View.VISIBLE
+            binding.saveMusicButton.bringToFront()
+        }
+    }
+
+    fun updatePhysics() {
+        if (common.isLogging) Log.d(TAG, "updatePhysics PuzzleSurface")
+
+        if (common.isPuzzleSolved) {
+            val solveTime = "Solve time = " + binding.puzzle.puzzle.solveTime + " secs."
+            val coroutineScope = CoroutineScope(Dispatchers.Main)
+            coroutineScope.launch {
+                binding.scoreText.text = solveTime
+                binding.scoreText.visibility = View.VISIBLE
+                val animation = AnimationUtils.loadAnimation(context, R.anim.fade_in)
+                animation.setAnimationListener(object : Animation.AnimationListener {
+                    override fun onAnimationStart(animation: Animation) {}
+                    override fun onAnimationEnd(animation: Animation) {}
+                    override fun onAnimationRepeat(animation: Animation) {}
+                })
+                binding.scoreText.animation = animation
+                showButtons()
+            }
+        }
     }
 }

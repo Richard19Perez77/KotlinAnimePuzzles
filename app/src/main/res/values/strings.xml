@@ -37,7 +37,7 @@
 
     <string name="TIME">time</string>
 
-    <string name="PATH">android.resource://com.updated.puzzles/</string>
+    <string name="PATH">android.resource://com.compose.myapplication/</string>
     <string name="wordpress_link_desc">Wordpress link</string>
     <string name="deviantart_link_desc">Deviant Art Link</string>
 
