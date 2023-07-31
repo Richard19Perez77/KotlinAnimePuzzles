@@ -15,9 +15,6 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import com.compose.myapplication.databinding.FragmentFirstBinding
@@ -30,7 +27,6 @@ class FirstFragment : Fragment() {
 
     val TAG = "com.updated.puzzles.PuzzleFragment"
 
-    lateinit var puzzleSurface: PuzzleSurface
     // lateinit var myMediaPlayer: MyMediaPlayer
     // lateinit var mySoundPool: MySoundPool
     lateinit var sharedpreferences: SharedPreferences
@@ -90,23 +86,23 @@ class FirstFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.new_puzzle -> {
-                puzzleSurface.newPuzzle()
+                binding.puzzle.newPuzzle()
                 return true;
             }
             R.id.music_toggle -> {
-                puzzleSurface.toggleMusic()
+                binding.puzzle.toggleMusic()
                 return true
             }
             R.id.set_toggle -> {
-                puzzleSurface.toggleSetSound()
+                binding.puzzle.toggleSetSound()
                 return true
             }
             R.id.border_toggle -> {
-                puzzleSurface.toggleBorder()
+                binding.puzzle.toggleBorder()
                 return true
             }
             R.id.win_toggle -> {
-                puzzleSurface.toggleWinSound()
+                binding.puzzle.toggleWinSound()
                 return true;
             }
             else -> return super.onOptionsItemSelected(item)
@@ -129,8 +125,6 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-
-        puzzleSurface = binding.puzzle
 
         common.devartButton = binding.devartButton
         binding.devartButton.setOnClickListener {
@@ -381,6 +375,40 @@ class FirstFragment : Fragment() {
 
     override fun onStop() {
         super.onStop()
+        // myMediaPlayer.onStop()
+
+        val slotString = binding.puzzle.slotString
+        val dateLong = common.currPuzzleTime
+
+        val editor = sharedpreferences.edit()
+        editor.putInt(getString(R.string.IMAGENUMBER), common.currentPuzzleImagePosition)
+        editor.putString(getString(R.string.SLOTS), slotString)
+        editor.putBoolean(getString(R.string.SOUND), common.playTapSound)
+        editor.putBoolean(getString(R.string.MUSIC), common.playMusic)
+        editor.putBoolean(getString(R.string.CHIME), common.playChimeSound)
+        editor.putBoolean(getString(R.string.BORDER), common.drawBorders)
+        editor.putInt(getString(R.string.POSITION), common.currentSoundPosition)
+        editor.putInt(getString(R.string.MUSIC_SAVED), common.musicSaved)
+        editor.putLong(getString(R.string.TIME), dateLong)
+        editor.putInt(getString(R.string.PUZZLES_SOLVED), common.puzzlesSolved)
+        editor.putInt(getString(R.string.IMAGES_SAVED), common.imagesSaved)
+        editor.putInt(getString(R.string.BLOG_LINKS_TRAVERSED), common.blogLinksTraversed)
+        editor.putInt(getString(R.string.TWO_SOLVE_COUNT), common.fourPiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.TWO_SOLVE_TIME), common.fourRecordSolveTime)
+        editor.putInt(getString(R.string.THREE_SOLVE_COUNT), common.ninePiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.THREE_SOLVE_TIME), common.nineRecordSolveTime)
+        editor.putInt(getString(R.string.FOUR_SOLVE_COUNT), common.sixteenPiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.FOUR_SOLVE_TIME), common.sixteenRecordSolveTime)
+        editor.putInt(getString(R.string.FIVE_SOLVE_COUNT), common.twentyfivePiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.FIVE_SOLVE_TIME), common.twentyfiveRecordSolveTime)
+        editor.putInt(getString(R.string.SIX_SOLVE_COUNT), common.thirtysixPiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.SIX_SOLVE_TIME), common.thirtysixRecordsSolveTime)
+        editor.putInt(
+            getString(R.string.SEVEN_SOLVE_COUNT),
+            common.fourtyninePiecePuzzleSolvedCount
+        )
+        editor.putLong(getString(R.string.SEVEN_SOLVE_TIME), common.fourtynineRecordsSolveTime)
+        editor.apply()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

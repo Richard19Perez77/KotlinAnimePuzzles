@@ -56,7 +56,7 @@ public class AdjustablePuzzle {
 
                     if (common.isPuzzleSplitCorrectly) {
                         common.isImageError = false;
-                        common.mySoundPool.playChimeSound();
+                        // common.mySoundPool.playChimeSound();
                         common.isImageLoaded = true;
                         checkToBeSolved();
                         updateAndDraw();
