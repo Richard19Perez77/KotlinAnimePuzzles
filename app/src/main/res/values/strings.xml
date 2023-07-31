@@ -1,0 +1,89 @@
+<resources>
+    <string name="app_name">My Application</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="new_puzzle">Create New Puzzle</string>
+    <string name="next_image">Continue</string>
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
+    <string name="music_toggle">Music On/Off</string>
+    <string name="set_toggle">Sound fx On/Off</string>
+    <string name="win_toggle">Win fx On/Off</string>
+    <string name="border_toggle">Border On/Off</string>
+    <string name="continue_desc">Continue</string>
+    <string name="music_desc">Music Link</string>
+    <string name="music_link">https://soundcloud.com/redshiftvocaloid/miku-luka-inikah-cinta</string>
+    <string name="artist">Rick</string>
+    <string name="facebook_app_id">1457754481207734</string>
+
+    <string name="menu_stats">Show Puzzle Stats</string>
+    <string name="save_image">Save this image?</string>
+    <string name="deviant_title">Deviant Art Notice</string>
+    <string name="deviant_message">\'s artworks may be more mature than what is seen here.</string>
+    <string name="cancel">Cancel</string>
+    <string name="wordpress_link">http://www.rpgfan.com/</string>
+
+    <string name="MY_PREFERENCES">MyPuzzle</string>
+    <string name="IMAGENUMBER">IMAGENUMBER</string>
+    <string name="SLOTS">SLOTS</string>
+    <string name="SOUND">SOUND</string>
+    <string name="CHIME">CHIME</string>
+    <string name="MUSIC">MUSIC</string>
+    <string name="BORDER">BORDER</string>
+    <string name="POSITION">POSITION</string>
+
+    <string name="TIME">time</string>
+
+    <string name="PATH">android.resource://com.updated.puzzles/</string>
+    <string name="wordpress_link_desc">Wordpress link</string>
+    <string name="deviantart_link_desc">Deviant Art Link</string>
+
+    <string name="PUZZLES_SOLVED">puzzlesSolved</string>
+
+    <string name="TWO_SOLVE_COUNT">twosolvecount</string>
+    <string name="TWO_SOLVE_TIME">twosolvetime</string>
+
+    <string name="THREE_SOLVE_COUNT">threesolvecount</string>
+    <string name="THREE_SOLVE_TIME">threesolvetime</string>
+
+    <string name="FOUR_SOLVE_COUNT">foursolvecount</string>
+    <string name="FOUR_SOLVE_TIME">foursolvetime</string>
+
+    <string name="FIVE_SOLVE_COUNT">fivesolvecount</string>
+    <string name="FIVE_SOLVE_TIME">fivesolvetime</string>
+
+    <string name="SIX_SOLVE_COUNT">sixsolvecount</string>
+    <string name="SIX_SOLVE_TIME">sixsolvetime</string>
+
+    <string name="SEVEN_SOLVE_COUNT">sevensolvecount</string>
+    <string name="SEVEN_SOLVE_TIME">sevensolvetime</string>
+
+    <string name="IMAGES_SAVED">imagessaved</string>
+    <string name="BLOG_LINKS_TRAVERSED">bloglinkstraversed</string>
+    <string name="puzzles_solved">Puzzles Solved</string>
+    <string name="zero">0</string>
+    <string name="two_x_puzzles_solved">2 x 2 Puzzles Solved</string>
+    <string name="two_x_two_record_solve_time">2 x 2 Record Solve Time</string>
+    <string name="three_x_three_puzzles_solved">3 x 3 Puzzles Solved</string>
+    <string name="three_x_three_record_solve_time">3 x 3 Record Solve Time</string>
+    <string name="four_x_four_puzzles_solved">4 x 4 Puzzles Solved</string>
+    <string name="four_x_four_record_solve_time">4 x 4 Record Solve Time</string>
+    <string name="five_x_five_puzzles_solved">5 x 5 Puzzles Solved</string>
+    <string name="five_x_five_record_solve_time">5 x 5 Record Solve Time</string>
+    <string name="six_x_six_puzzles_solved">6 x 6 Puzzles Solved</string>
+    <string name="six_x_six_record_solve_time">6 x 6 Record Solve Time</string>
+    <string name="seven_x_seven_puzzles_solved">7 x 7 Puzzles Solved</string>
+    <string name="seven_x_seven_record_solve_time">7 x 7 Record Solve Time</string>
+    <string name="images_saved">Images Saved</string>
+    <string name="blog_links_traversed">Blog Links Traversed</string>
+    <string name="MUSIC_SAVED">musicsaved</string>
+    <string name="music_links_traversed">Music Tracks Saved</string>
+    <string name="save_image_button">save image button</string>
+    <string name="save_music_button">save music button</string>
+    <string name="save_read_write_rationale">Allow save feature?</string>
+    <string name="permission_not_granted">Permission NOT granted</string>
+    <string name="lorem_ipsum">Hi!</string>
+</resources>
