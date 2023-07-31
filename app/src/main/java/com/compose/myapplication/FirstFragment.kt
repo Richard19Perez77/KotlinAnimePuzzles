@@ -8,11 +8,16 @@ import android.content.SharedPreferences
 import android.media.AudioManager
 import android.os.Bundle
 import android.util.Log
+import android.view.ContextMenu
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
+import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import com.compose.myapplication.databinding.FragmentFirstBinding
@@ -69,6 +74,45 @@ class FirstFragment : Fragment() {
         }
     }
 
+    override fun onCreateContextMenu(
+        menu: ContextMenu,
+        v: View,
+        menuInfo: ContextMenu.ContextMenuInfo?
+    ) {
+        super.onCreateContextMenu(menu, v, menuInfo)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.main_puzzle, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.new_puzzle -> {
+                puzzleSurface.newPuzzle()
+                return true;
+            }
+            R.id.music_toggle -> {
+                puzzleSurface.toggleMusic()
+                return true
+            }
+            R.id.set_toggle -> {
+                puzzleSurface.toggleSetSound()
+                return true
+            }
+            R.id.border_toggle -> {
+                puzzleSurface.toggleBorder()
+                return true
+            }
+            R.id.win_toggle -> {
+                puzzleSurface.toggleWinSound()
+                return true;
+            }
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -80,11 +124,13 @@ class FirstFragment : Fragment() {
         common.res = requireContext().resources
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
+
+        puzzleSurface = binding.puzzle
 
         common.devartButton = binding.devartButton
         binding.devartButton.setOnClickListener {
