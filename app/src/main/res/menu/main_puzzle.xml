@@ -5,6 +5,11 @@
     tools:context=".FirstFragment">
 
     <item
+        android:id="@+id/menu_stats"
+        android:icon="@drawable/ic_launcher_background"
+        android:title="@string/menu_stats"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/new_puzzle"
         android:icon="@drawable/ic_launcher_background"
         android:title="@string/new_puzzle"

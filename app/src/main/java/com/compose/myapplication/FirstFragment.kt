@@ -25,11 +25,12 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.Navigation.findNavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import com.compose.myapplication.databinding.FragmentFirstBinding
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
@@ -53,11 +54,10 @@ class FirstFragment : Fragment() {
         const val TAG = "com.updated.puzzles.PuzzleFragment"
     }
 
-    // lateinit var myMediaPlayer: MyMediaPlayer
-    // lateinit var mySoundPool: MySoundPool
+    lateinit var myMediaPlayer: MyMediaPlayer
+    lateinit var mySoundPool: MySoundPool
     lateinit var sharedpreferences: SharedPreferences
     lateinit var noisyAudioStreamReceiver: NoisyAudioStreamReceiver
-    lateinit var requestPermissionLauncher: ActivityResultLauncher<String>
     var common = CommonVariables.getInstance()
 
     private val intentFilter = IntentFilter(
@@ -108,6 +108,11 @@ class FirstFragment : Fragment() {
                 return true
             }
 
+            R.id.menu_stats -> {
+                startStatsFragment()
+                return true
+            }
+
             R.id.music_toggle -> {
                 binding.puzzle.toggleMusic()
                 return true
@@ -144,20 +149,6 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-
-        requestPermissionLauncher = registerForActivityResult<String, Boolean>(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            if (isGranted) {
-
-            } else {
-                // Explain to the user that the feature is unavailable because the
-                // feature requires a permission that the user has denied. At the
-                // same time, respect the user's decision. Don't link to system
-                // settings in an effort to convince the user to change their
-                // decision.
-            }
-        }
 
         binding.devartButton.setOnClickListener {
             hideButtons()
@@ -219,7 +210,7 @@ class FirstFragment : Fragment() {
                     if (result) showToast("Success!") else showToast("Error!")
                 }
             } else {
-                marshmallowSaveMusic();
+                saveMusic();
             }
         }
 
@@ -283,7 +274,7 @@ class FirstFragment : Fragment() {
         return@withContext false
     }
 
-    private fun saveImage() {
+    fun saveImage() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -388,13 +379,15 @@ class FirstFragment : Fragment() {
         toast.show()
     }
 
+    private fun startStatsFragment() {
+        findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
+    }
 
-    private fun marshmallowSaveMusic() {
+    public fun saveMusic() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            != PackageManager.PERMISSION_GRANTED
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
             requestReadWritePermission(MainActivity.WRITE_EXTERNAL_STORAGE_MUSIC)
         } else {
