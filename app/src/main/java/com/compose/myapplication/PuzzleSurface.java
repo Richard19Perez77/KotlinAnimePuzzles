@@ -175,7 +175,7 @@ public class PuzzleSurface extends SurfaceView implements
         puzzle = new AdjustablePuzzle(ps);
         puzzle.initPieces(sides);
         puzzle.getNewImageLoadedScaledDivided();
-        // hideButtons(context);
+        fragment.hideButtons();
     }
 
     /**
@@ -188,7 +188,7 @@ public class PuzzleSurface extends SurfaceView implements
         puzzle = new AdjustablePuzzle(ps);
         puzzle.initPieces(3);
         puzzle.getNewImageLoadedScaledDivided();
-        // hideButtons(context);
+        fragment.hideButtons();
     }
 
     /**
@@ -202,7 +202,7 @@ public class PuzzleSurface extends SurfaceView implements
         int sides = (int) common.dimensions;
         puzzle.initPieces(sides);
         puzzle.getPreviousImageLoadedScaledDivided();
-        // hideButtons(context);
+        fragment.hideButtons();
     }
 
     public void cleanUp() {

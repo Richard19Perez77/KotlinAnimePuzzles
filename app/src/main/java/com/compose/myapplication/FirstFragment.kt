@@ -396,7 +396,7 @@ class FirstFragment : Fragment() {
         }
     }
 
-    private fun hideButtons() {
+    public fun hideButtons() {
         if (binding.scoreText.visibility == View.VISIBLE) {
             binding.scoreText.visibility = View.INVISIBLE
         }
