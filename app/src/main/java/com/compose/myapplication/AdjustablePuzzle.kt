@@ -4,6 +4,9 @@ import android.graphics.Bitmap
 import android.graphics.Point
 import android.util.Log
 import android.view.MotionEvent
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.Date
 
 /**
@@ -18,98 +21,107 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private var pieces = 0
     private var xparts = 0
     private var yparts = 0
+    private var TAG = "com.compose.myapplication.AdjustablePuzzle"
 
     fun getPreviousImageLoadedScaledDivided() {
-        if (CommonVariables.isLogging) Log.d(TAG, "getPreviousImageLoadedScaledDivided AdjustablePuzzleImpl")
+        if (CommonVariables.isLogging) Log.d(
+            TAG,
+            "getPreviousImageLoadedScaledDivided AdjustablePuzzleImpl"
+        )
 
-        CommonVariables.isPuzzleSplitCorrectly = false
-        CommonVariables.isPuzzleSolved = false
-        val thread: Thread = object : Thread() {
-            override fun run() {
-                while (!CommonVariables.isPuzzleSplitCorrectly) {
-                    // get new index value and then remove index
-                    CommonVariables.index = CommonVariables.currentPuzzleImagePosition
-                    CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
-                        CommonVariables.res,
-                        CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
-                        CommonVariables.screenW, CommonVariables.screenH
-                    )
-                    CommonVariables.image = Bitmap.createScaledBitmap(
-                        CommonVariables.image!!,
-                        CommonVariables.screenW, CommonVariables.screenH, true
-                    )
-                    CommonVariables.isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
-                    if (CommonVariables.isPuzzleSplitCorrectly) {
-                        CommonVariables.isImageError = false
-                        CommonVariables.mySoundPool?.playChimeSound()
-                        CommonVariables.isImageLoaded = true
-                        checkToBeSolved()
-                        updateAndDraw()
-                    } else {
-                        CommonVariables.isImageError = true
-                    }
+        val customScope = CoroutineScope(Dispatchers.Default)
+        customScope.launch {
+            // Your coroutine code
+
+            CommonVariables.isPuzzleSplitCorrectly = false
+            CommonVariables.isPuzzleSolved = false
+
+            while (!CommonVariables.isPuzzleSplitCorrectly) {
+                // get new index value and then remove index
+                CommonVariables.index = CommonVariables.currentPuzzleImagePosition
+                CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
+                    CommonVariables.res,
+                    CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
+                    CommonVariables.screenW, CommonVariables.screenH
+                )
+                CommonVariables.image = Bitmap.createScaledBitmap(
+                    CommonVariables.image!!,
+                    CommonVariables.screenW, CommonVariables.screenH, true
+                )
+                CommonVariables.isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
+                if (CommonVariables.isPuzzleSplitCorrectly) {
+                    CommonVariables.isImageError = false
+                    CommonVariables.mySoundPool?.playChimeSound()
+                    CommonVariables.isImageLoaded = true
+                    checkToBeSolved()
+                    updateAndDraw()
+                } else {
+                    CommonVariables.isImageError = true
                 }
             }
         }
-        thread.start()
     }
 
     /**
      * Called when shared preferences are invalid or a new puzzle is selected after the solve of one. Use a loading thread to set up the puzzle off the main thread.
      */
     fun getNewImageLoadedScaledDivided() {
-        if (CommonVariables.isLogging) Log.d(TAG, "getNewImageLoadedScaledDivided AdjustablePuzzleImpl")
+        if (CommonVariables.isLogging) Log.d(
+            TAG,
+            "getNewImageLoadedScaledDivided AdjustablePuzzleImpl"
+        )
 
         CommonVariables.isPuzzleSplitCorrectly = false
         CommonVariables.isPuzzleSolved = false
 
-        val thread: Thread = object : Thread() {
-            override fun run() {
-                while (!CommonVariables.isPuzzleSplitCorrectly) {
+        val customScope = CoroutineScope(Dispatchers.Default)
+        customScope.launch {
+            while (!CommonVariables.isPuzzleSplitCorrectly) {
 
-                    // fill with all valid numbers
-                    if (CommonVariables.imagesShown.isEmpty()) for (i in CommonVariables.data.artworks.indices) CommonVariables.imagesShown.add(
-                        i
-                    )
+                // fill with all valid numbers
+                if (CommonVariables.imagesShown.isEmpty()) for (i in CommonVariables.data.artworks.indices) CommonVariables.imagesShown.add(
+                    i
+                )
 
-                    // get new index value from remaining images
-                    CommonVariables.index = CommonVariables.rand.nextInt(CommonVariables.imagesShown.size)
+                // get new index value from remaining images
+                CommonVariables.index =
+                    CommonVariables.rand.nextInt(CommonVariables.imagesShown.size)
 
-                    //edit to change to a direct image
-                    //CommonVariables.index = 141;
+                //edit to change to a direct image
+                //CommonVariables.index = 141;
 
-                    // get the value at that index for new imageID
-                    CommonVariables.currentPuzzleImagePosition = CommonVariables.imagesShown[CommonVariables.index]
+                // get the value at that index for new imageID
+                CommonVariables.currentPuzzleImagePosition =
+                    CommonVariables.imagesShown[CommonVariables.index]
 
-                    // remove from list to prevent duplicates
-                    CommonVariables.imagesShown.removeAt(CommonVariables.index)
+                // remove from list to prevent duplicates
+                CommonVariables.imagesShown.removeAt(CommonVariables.index)
 
-                    // start decoding and scaling
-                    CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
-                        CommonVariables.res,
-                        CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
-                        CommonVariables.screenW, CommonVariables.screenH
-                    )
-                    CommonVariables.image = Bitmap.createScaledBitmap(
-                        CommonVariables.image!!,
-                        CommonVariables.screenW, CommonVariables.screenH, true
-                    )
-                    CommonVariables.isPuzzleSplitCorrectly = divideBitmap()
-                    if (CommonVariables.isPuzzleSplitCorrectly) {
-                        resetTimer()
-                        CommonVariables.isImageError = false
-                        CommonVariables.mySoundPool?.playChimeSound()
-                        CommonVariables.isImageLoaded = true
-                        checkToBeSolved()
-                        updateAndDraw()
-                    } else {
-                        CommonVariables.isImageError = true
-                    }
+                // start decoding and scaling
+                CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
+                    CommonVariables.res,
+                    CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
+                    CommonVariables.screenW, CommonVariables.screenH
+                )
+                CommonVariables.image = Bitmap.createScaledBitmap(
+                    CommonVariables.image!!,
+                    CommonVariables.screenW, CommonVariables.screenH, true
+                )
+                CommonVariables.isPuzzleSplitCorrectly = divideBitmap()
+                if (CommonVariables.isPuzzleSplitCorrectly) {
+                    resetTimer()
+                    CommonVariables.isImageError = false
+                    CommonVariables.mySoundPool?.playChimeSound()
+                    CommonVariables.isImageLoaded = true
+                    checkToBeSolved()
+                    updateAndDraw()
+                } else {
+                    CommonVariables.isImageError = true
                 }
             }
         }
-        thread.start()
     }
+
 
     /**
      * Switch every index with a random index to make the puzzle random.
@@ -183,7 +195,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      *
      * @return
      */
-    fun divideBitmapFromPreviousPuzzle(): Boolean {
+    private fun divideBitmapFromPreviousPuzzle(): Boolean {
         CommonVariables.initPrevDivideBitmap(pieces)
         CommonVariables.piecesComplete = 0
         assignXandYtoBorderPointIndex()
@@ -196,7 +208,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      *
      * @return
      */
-    fun divideBitmap(): Boolean {
+    private fun divideBitmap(): Boolean {
         CommonVariables.initDivideBitmap(pieces)
         CommonVariables.piecesComplete = 0
         assignXandYtoBorderPointIndex()
@@ -228,7 +240,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         CommonVariables.puzzleSlots[i]?.sy2 = y + bitmapH
         CommonVariables.puzzleSlots[i]?.puzzlePiece = CommonVariables.puzzlePieces[i]!!
         CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum = i
-        CommonVariables.puzzleSlots[i]?.slotNum = CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum!!
+        CommonVariables.puzzleSlots[i]?.slotNum =
+            CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum!!
         CommonVariables.piecesComplete++
     }
 
@@ -314,12 +327,14 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
             // get moving piece and center it on user touch point
             CommonVariables.movingPiece = true
             if (CommonVariables.currSlotOnTouchDown in 0 until pieces) {
-                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px  = (moveX
-                        - (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
-                    ?.width ?: 0) / 2)
-                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py = (moveY
-                        - (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
-                    ?.height ?: 0) / 2)
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px =
+                    (moveX
+                            - (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
+                        ?.width ?: 0) / 2)
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py =
+                    (moveY
+                            - (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
+                        ?.height ?: 0) / 2)
             }
             updateAndDraw()
         } else if (event.action == MotionEvent.ACTION_UP) {
@@ -504,10 +519,5 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         if (CommonVariables.inPlace == CommonVariables.numberOfPieces) {
             CommonVariables.isPuzzleSolved = true
         }
-    }
-
-    companion object {
-        //tag used for logging
-        private const val TAG = "puzzleLog"
     }
 }
