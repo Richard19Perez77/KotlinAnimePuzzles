@@ -49,13 +49,13 @@ class FirstFragment : Fragment() {
 
     companion object {
         const val PUZZLE_LOG = "puzzleLog"
-        const val TAG = "com.updated.puzzles.PuzzleFragment"
+        const val TAG = "com.compose.myapplication.FirstFragment"
     }
 
     lateinit var myMediaPlayer: MyMediaPlayer
-    lateinit var mySoundPool: MySoundPool
-    lateinit var sharedpreferences: SharedPreferences
-    lateinit var noisyAudioStreamReceiver: NoisyAudioStreamReceiver
+    private lateinit var mySoundPool: MySoundPool
+    private lateinit var sharedpreferences: SharedPreferences
+    private lateinit var noisyAudioStreamReceiver: NoisyAudioStreamReceiver
 
     private val intentFilter = IntentFilter(
         AudioManager.ACTION_AUDIO_BECOMING_NOISY
@@ -379,11 +379,7 @@ class FirstFragment : Fragment() {
     }
 
     fun saveMusic() {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestReadWritePermission(MainActivity.WRITE_EXTERNAL_STORAGE_MUSIC)
         } else {
             val intent = Intent(context, SaveMusicService::class.java)
@@ -421,8 +417,7 @@ class FirstFragment : Fragment() {
 
         val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-        CommonVariables.volume =
-            (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
+        CommonVariables.volume = (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
         noisyAudioStreamReceiver = NoisyAudioStreamReceiver()
         startPlayback()
         if (CommonVariables.playMusic) {

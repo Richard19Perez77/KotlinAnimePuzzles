@@ -14,7 +14,7 @@ import com.compose.myapplication.databinding.FragmentSecondBinding
 class SecondFragment : Fragment() {
 
     companion object{
-        const val TAG = "com.updated.puzzles.PuzzleStatsFragment"
+        const val TAG = "com.compose.myapplication.PuzzleStatsFragment"
     }
 
     private var _binding: FragmentSecondBinding? = null

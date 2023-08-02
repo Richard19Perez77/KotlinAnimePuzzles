@@ -417,20 +417,6 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     }
 
     /**
-     * Used to recycle all bitmaps used in pieces
-     */
-    fun recylceAll() {
-        if (CommonVariables.image != null) CommonVariables.image!!.recycle()
-        for (i in CommonVariables.puzzlePieces.indices) {
-            if (CommonVariables.puzzlePieces[i] != null) {
-                if (CommonVariables.puzzlePieces[i]?.bitmap != null) {
-                    CommonVariables.puzzlePieces[i]?.bitmap!!.recycle()
-                }
-            }
-        }
-    }
-
-    /**
      * Add time to the timer for the current puzzle.
      */
     private fun addTimeToTimer() {
