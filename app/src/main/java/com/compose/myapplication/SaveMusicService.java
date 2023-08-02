@@ -109,7 +109,7 @@ public class SaveMusicService extends IntentService {
 
                         serviceToast("Track Saved!");
 
-                        CommonVariables.getInstance().musicSaved++;
+                        CommonVariables.musicSaved++;
                         serviceUpdateUI();
 
                         MediaScannerConnection

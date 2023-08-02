@@ -32,7 +32,6 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
     var puzzle: AdjustablePuzzle? = null
     var puzzleUpdateAndDraw: PuzzleUpdateAndDraw?
     var myMediaPlayer: MyMediaPlayer? = null
-    var common : CommonVariables = CommonVariables.getInstance()!!
     private var ps: PuzzleSurface = this
     private var defaultPuzzleSize = "2"
     lateinit var fragment: FirstFragment
@@ -43,14 +42,14 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * @param hasWindowFocus
      */
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        if (common.isLogging) Log.d(
+        if (CommonVariables.isLogging) Log.d(
             TAG,
             "onWindowFocusChanged PuzzleSurface hasWindowFocus:$hasWindowFocus"
         )
         if (!hasWindowFocus) {
-            common.isWindowInFocus = false
+            CommonVariables.isWindowInFocus = false
         } else {
-            common.isWindowInFocus = true
+            CommonVariables.isWindowInFocus = true
             puzzleUpdateAndDraw!!.updateAndDraw()
         }
     }
@@ -67,9 +66,9 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
         holder: SurfaceHolder, format: Int, width: Int,
         height: Int
     ) {
-        if (common.isLogging) Log.d(TAG, "surfaceChanged PuzzleSurface $width $height")
+        if (CommonVariables.isLogging) Log.d(TAG, "surfaceChanged PuzzleSurface $width $height")
         puzzleUpdateAndDraw!!.surfaceChanged(width, height)
-        if (common.resumePreviousPuzzle) {
+        if (CommonVariables.resumePreviousPuzzle) {
             resumePuzzle()
         } else {
             createPuzzle()
@@ -82,16 +81,16 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * @param holder
      */
     override fun surfaceCreated(holder: SurfaceHolder) {
-        if (common.isLogging) Log.d(TAG, "surfaceCreated PuzzleSurface")
+        if (CommonVariables.isLogging) Log.d(TAG, "surfaceCreated PuzzleSurface")
         puzzleUpdateAndDraw = PuzzleUpdateAndDraw(holder)
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
-        if (common.isLogging) Log.d(TAG, "surfaceDestroyed PuzzleSurface")
+        if (CommonVariables.isLogging) Log.d(TAG, "surfaceDestroyed PuzzleSurface")
     }
 
     override fun performClick(): Boolean {
-        if (common.isLogging) Log.d(TAG, "performClick PuzzleSurface")
+        if (CommonVariables.isLogging) Log.d(TAG, "performClick PuzzleSurface")
         super.performClick()
         return true
     }
@@ -105,8 +104,8 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
             if (event.action == MotionEvent.ACTION_UP) {
                 performClick()
             }
-            if (common.isWindowInFocus && common.isImageLoaded) {
-                return if (common.isPuzzleSolved) {
+            if (CommonVariables.isWindowInFocus && CommonVariables.isImageLoaded) {
+                return if (CommonVariables.isPuzzleSolved) {
                     fragment.toggleUIOverlay()
                     false
                 } else {
@@ -123,8 +122,8 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * @param sides
      */
     private fun createNewSizedPuzzle(sides: Int) {
-        if (common.isLogging) Log.d(TAG, "createNewSizedPuzzle PuzzleSurface")
-        common.isImageLoaded = false
+        if (CommonVariables.isLogging) Log.d(TAG, "createNewSizedPuzzle PuzzleSurface")
+        CommonVariables.isImageLoaded = false
         puzzle = AdjustablePuzzle(ps)
         puzzle!!.initPieces(sides)
         puzzle!!.getNewImageLoadedScaledDivided()
@@ -135,8 +134,8 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * Create a default 3 x 3 puzzle, used if shared prefs fail or first app use.
      */
     private fun createPuzzle() {
-        if (common.isLogging) Log.d(TAG, "createPuzzle PuzzleSurface")
-        common.isImageLoaded = false
+        if (CommonVariables.isLogging) Log.d(TAG, "createPuzzle PuzzleSurface")
+        CommonVariables.isImageLoaded = false
         puzzle = AdjustablePuzzle(ps)
         puzzle!!.initPieces(3)
         puzzle!!.getNewImageLoadedScaledDivided()
@@ -147,10 +146,10 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * Load the previous puzzle from shared preferences.
      */
     private fun resumePuzzle() {
-        if (common.isLogging) Log.d(TAG, "resumePuzzle PuzzleSurface")
-        common.isImageLoaded = false
+        if (CommonVariables.isLogging) Log.d(TAG, "resumePuzzle PuzzleSurface")
+        CommonVariables.isImageLoaded = false
         puzzle = AdjustablePuzzle(ps)
-        val sides = common.dimensions.toInt()
+        val sides = CommonVariables.dimensions.toInt()
         puzzle!!.initPieces(sides)
         puzzle!!.getPreviousImageLoadedScaledDivided()
         fragment.hideButtons()
@@ -164,12 +163,12 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
          */
         get() {
             var s = ""
-            if (common.puzzleSlots != null) for (i in common.puzzleSlots.indices) {
-                if (common.puzzleSlots[i] != null) {
+            for (i in CommonVariables.puzzleSlots.indices) {
+                if (CommonVariables.puzzleSlots[i] != null) {
                     s = if (i == 0) {
-                        "" + common.puzzleSlots[i].puzzlePiece.pieceNum
+                        "" + (CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum)
                     } else {
-                        s + "," + common.puzzleSlots[i].puzzlePiece.pieceNum
+                        s + "," + (CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum)
                     }
                 }
             }
@@ -244,11 +243,11 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * Set flag for music on/off.
      */
     fun toggleMusic() {
-        if (common.playMusic) {
-            common.playMusic = false
+        if (CommonVariables.playMusic) {
+            CommonVariables.playMusic = false
             showToast("Music Off")
         } else {
-            common.playMusic = true
+            CommonVariables.playMusic = true
             showToast("Music On")
         }
         myMediaPlayer!!.togglePause()
@@ -258,11 +257,11 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * Set flag for drawing the border on/off.
      */
     fun toggleBorder() {
-        if (common.drawBorders) {
-            common.drawBorders = false
+        if (CommonVariables.drawBorders) {
+            CommonVariables.drawBorders = false
             showToast("Borders Off")
         } else {
-            common.drawBorders = true
+            CommonVariables.drawBorders = true
             showToast("Borders On")
         }
     }
@@ -271,11 +270,11 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * Set flag for win chime on/off.
      */
     fun toggleWinSound() {
-        if (common.playChimeSound) {
-            common.playChimeSound = false
+        if (CommonVariables.playChimeSound) {
+            CommonVariables.playChimeSound = false
             showToast("Win Effect Off")
         } else {
-            common.playChimeSound = true
+            CommonVariables.playChimeSound = true
             showToast("Win Effect On")
         }
     }
@@ -284,7 +283,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * Pause the puzzle and draw class.
      */
     fun onPause() {
-        if (common.isLogging) Log.d(TAG, "onPause PuzzleSurface")
+        if (CommonVariables.isLogging) Log.d(TAG, "onPause PuzzleSurface")
         if (puzzleUpdateAndDraw != null) {
             puzzleUpdateAndDraw!!.pause()
         }
@@ -294,11 +293,11 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * Set flag for toggle sound on/off.
      */
     fun toggleSetSound() {
-        if (common.playTapSound) {
-            common.playTapSound = false
+        if (CommonVariables.playTapSound) {
+            CommonVariables.playTapSound = false
             showToast("Set Effect Off")
         } else {
-            common.playTapSound = true
+            CommonVariables.playTapSound = true
             showToast("Set Effect On")
         }
     }
@@ -312,7 +311,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
          * Lock the canvas before drawing then unlock to perform the draw.
          */
         fun updateAndDraw() {
-            if (common.isLogging) Log.d(TAG, "updateAndDraw PuzzleSurface")
+            if (CommonVariables.isLogging) Log.d(TAG, "updateAndDraw PuzzleSurface")
             fragment.updatePhysics()
             var c: Canvas? = null
             try {
@@ -333,18 +332,18 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
          * @param canvas
          */
         private fun doDraw(canvas: Canvas?) {
-            if (common.isLogging) Log.d(TAG, "doDraw PuzzleSurface")
+            if (CommonVariables.isLogging) Log.d(TAG, "doDraw PuzzleSurface")
             if (canvas != null) {
                 canvas.drawColor(Color.BLACK)
-                if (common.isImageLoaded) {
-                    if (common.movingPiece) {
+                if (CommonVariables.isImageLoaded) {
+                    if (CommonVariables.movingPiece) {
                         drawImageWithMovingPiece(canvas)
                     } else {
                         drawImage(canvas)
                     }
                 } else {
                     // the imageID is still loading or in error
-                    if (common.isImageError) {
+                    if (CommonVariables.isImageError) {
                         canvas.drawColor(Color.RED)
                     } else {
                         canvas.drawColor(Color.BLUE)
@@ -359,29 +358,41 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
          * @param canvas
          */
         private fun drawImage(canvas: Canvas) {
-            if (common.isLogging) Log.d(TAG, "drawImage PuzzleSurface")
-            for (i in 0 until common.numberOfPieces) {
-                if (!common.puzzleSlots[i].puzzlePiece.bitmap?.isRecycled!!) {
+            if (CommonVariables.isLogging) Log.d(TAG, "drawImage PuzzleSurface")
+            for (i in 0 until CommonVariables.numberOfPieces) {
+                if (!CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap?.isRecycled!!) {
 
                     // draw pieces
-                    canvas.drawBitmap(
-                        common.puzzleSlots[i].puzzlePiece.bitmap!!,
-                        common.puzzleSlots[i].puzzlePiece.px.toFloat(),
-                        common.puzzleSlots[i].puzzlePiece.py.toFloat(), null
-                    )
+                    CommonVariables.puzzleSlots[i]?.puzzlePiece?.px?.let {
+                        CommonVariables.puzzleSlots[i]?.puzzlePiece?.py?.let { it1 ->
+                            canvas.drawBitmap(
+                                CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap!!,
+                                it.toFloat(),
+                                it1.toFloat(), null
+                            )
+                        }
+                    }
                     // draw borders
-                    if (!common.isPuzzleSolved && common.drawBorders) {
-                        canvas.drawRect(
-                            common.puzzleSlots[i].sx.toFloat(),
-                            common.puzzleSlots[i].sy.toFloat(), (
-                                    common.puzzleSlots[i].sx
-                                            + (common.puzzleSlots[i].puzzlePiece.bitmap
-                                                ?.width ?: 0)).toFloat(), (
-                                    common.puzzleSlots[i].sy
-                                            + (common.puzzleSlots[i].puzzlePiece.bitmap
-                                                ?.height ?: 0)).toFloat(),
-                            borderPaintA
-                        )
+                    if (!CommonVariables.isPuzzleSolved && CommonVariables.drawBorders) {
+                        CommonVariables.puzzleSlots[i]?.sx?.let {
+                            CommonVariables.puzzleSlots[i]?.sy?.let { it1 ->
+                                (CommonVariables.puzzleSlots[i]?.sx)?.plus(
+                                    (CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap
+                                        ?.width ?: 0)
+                                )?.let { it2 ->
+                                    (CommonVariables.puzzleSlots[i]?.sy)?.plus(
+                                        (CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap
+                                            ?.height ?: 0)
+                                    )?.let { it3 ->
+                                        canvas.drawRect(
+                                            it.toFloat(),
+                                            it1.toFloat(), it2.toFloat(), it3.toFloat(),
+                                            borderPaintA
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -393,84 +404,121 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
          * @param canvas
          */
         private fun drawImageWithMovingPiece(canvas: Canvas) {
-            for (i in 0 until common.numberOfPieces) {
+            for (i in 0 until CommonVariables.numberOfPieces) {
                 // draw pieces
-                if (!common.puzzleSlots[i].puzzlePiece.bitmap?.isRecycled!! && common.currSlotOnTouchDown != i) canvas.drawBitmap(
-                    common.puzzleSlots[i].puzzlePiece.bitmap!!,
-                    common.puzzleSlots[i].puzzlePiece.px.toFloat(),
-                    common.puzzleSlots[i].puzzlePiece.py.toFloat(), null
-                )
+                if (!CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap?.isRecycled!! && CommonVariables.currSlotOnTouchDown != i) CommonVariables.puzzleSlots[i]?.puzzlePiece?.px?.toFloat()
+                    ?.let {
+                        CommonVariables.puzzleSlots[i]?.puzzlePiece?.py?.let { it1 ->
+                            canvas.drawBitmap(
+                                CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap!!,
+                                it,
+                                it1.toFloat(), null
+                            )
+                        }
+                    }
                 // draw border to pieces
-                if (!common.isPuzzleSolved && common.drawBorders) canvas.drawRect(
-                    common.puzzleSlots[i].sx.toFloat(),
-                    common.puzzleSlots[i].sy.toFloat(), (
-                            common.puzzleSlots[i].sx
-                                    + (common.puzzleSlots[i].puzzlePiece.bitmap
-                                        ?.width ?: 0)).toFloat(), (
-                            common.puzzleSlots[i].sy
-                                    + (common.puzzleSlots[i].puzzlePiece.bitmap
-                                        ?.height ?: 0)).toFloat(),
-                    borderPaintA
-                )
+                if (!CommonVariables.isPuzzleSolved && CommonVariables.drawBorders) CommonVariables.puzzleSlots[i]?.sx?.let {
+                    CommonVariables.puzzleSlots[i]?.sy?.let { it1 ->
+                        (CommonVariables.puzzleSlots[i]?.sx)?.plus(
+                            (CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap
+                                ?.width ?: 0)
+                        )?.let { it2 ->
+                            (CommonVariables.puzzleSlots[i]?.sy)?.plus(
+                                (CommonVariables.puzzleSlots[i]?.puzzlePiece?.bitmap
+                                    ?.height ?: 0)
+                            )?.let { it3 ->
+                                canvas.drawRect(
+                                    it.toFloat(),
+                                    it1.toFloat(), it2.toFloat(), it3.toFloat(),
+                                    borderPaintA
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             // draw moving piece and its shadow
-            if (!common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap?.isRecycled!!) {
+            if (!CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap?.isRecycled!!) {
 
                 // draw moving imageID in original location
-                canvas.drawBitmap(
-                    common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap!!,
-                    common.puzzleSlots[common.currSlotOnTouchDown].sx.toFloat(),
-                    common.puzzleSlots[common.currSlotOnTouchDown].sy.toFloat(),
-                    transPaint
-                )
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy?.let {
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sx?.let { it1 ->
+                        canvas.drawBitmap(
+                            CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap!!,
+                            it1.toFloat(),
+                            it.toFloat(),
+                            transPaint
+                        )
+                    }
+                }
 
                 // draw border around original piece location
-                canvas.drawRect(
-                    common.puzzleSlots[common.currSlotOnTouchDown].sx.toFloat(),
-                    common.puzzleSlots[common.currSlotOnTouchDown].sy.toFloat(), (
-                            common.puzzleSlots[common.currSlotOnTouchDown].sx
-                                    + (common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap
-                                        ?.width ?: 0)).toFloat(), (
-                            common.puzzleSlots[common.currSlotOnTouchDown].sy
-                                    + (common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap
-                                        ?.height ?: 0)).toFloat(), borderPaintB
-                )
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sx?.let {
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy?.let { it1 ->
+                        (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sx)?.plus(
+                            (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
+                                ?.width ?: 0)
+                        )?.let { it2 ->
+                            (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy)?.plus(
+                                (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
+                                    ?.height ?: 0)
+                            )?.let { it3 ->
+                                canvas.drawRect(
+                                    it.toFloat(),
+                                    it1.toFloat(), it2.toFloat(), it3.toFloat(), borderPaintB
+                                )
+                            }
+                        }
+                    }
+                }
 
                 // draw moving piece
-                canvas.drawBitmap(
-                    common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap!!,
-                    common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.px.toFloat(),
-                    common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.py.toFloat(),
-                    fullPaint
-                )
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px?.let {
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py?.let { it1 ->
+                        canvas.drawBitmap(
+                            CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap!!,
+                            it.toFloat(),
+                            it1.toFloat(),
+                            fullPaint
+                        )
+                    }
+                }
 
                 // draw border around moving piece
-                if (common.drawBorders) canvas.drawRect(
-                    (
-                            common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.px + STROKE_VALUE / 2).toFloat(),
-                    (
-                            common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.py + STROKE_VALUE / 2).toFloat(),
-                    (
-                            common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.px
-                                    + (common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap
-                                        ?.width ?: 0)
-                                    - (STROKE_VALUE / 2)).toFloat(),
-                    (
-                            common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.py
-                                    + (common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap
-                                        ?.height ?: 0)
-                                    - (STROKE_VALUE / 2)).toFloat(),
-                    borderPaintA
-                )
+                if (CommonVariables.drawBorders) (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px)?.plus(
+                    STROKE_VALUE / 2
+                )?.let {
+                    (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py)?.plus(
+                        STROKE_VALUE / 2
+                    )?.let { it1 ->
+                        ((CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px)?.plus(
+                            (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
+                                ?.width ?: 0)
+                        ))?.minus((STROKE_VALUE / 2))?.let { it2 ->
+                            ((CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py)?.plus(
+                                (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
+                                    ?.height ?: 0)
+                            ))?.minus((STROKE_VALUE / 2))?.let { it3 ->
+                                canvas.drawRect(
+                                    it.toFloat(),
+                                    it1.toFloat(),
+                                    it2.toFloat(),
+                                    it3.toFloat(),
+                                    borderPaintA
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
 
         fun surfaceChanged(width: Int, height: Int) {
             // synchronized to make sure these all change atomically
             synchronized(surfaceHolder) {
-                common.screenW = width
-                common.screenH = height
+                CommonVariables.screenW = width
+                CommonVariables.screenH = height
             }
         }
 

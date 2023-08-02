@@ -9,7 +9,7 @@ import android.media.SoundPool
  * @author Rick
  */
 class MySoundPool @Suppress("deprecation") constructor(
-    var context: Context,
+    var context: Context?,
     maxStreams: Int,
     streamType: Int,
     srcQuality: Int
@@ -17,22 +17,21 @@ class MySoundPool @Suppress("deprecation") constructor(
 
     private val TAP = 1
     private val CHIME = 2
-    private var commonVariables: CommonVariables = CommonVariables.getInstance()
 
     /**
      * Check for sound file to be loaded and wanting to be player
      */
     fun playChimeSound() {
-        if (commonVariables.chimeLoaded && commonVariables.playChimeSound)
-            play(commonVariables.saveSound, commonVariables.volume, commonVariables.volume, 1, 0, 1f)
+        if (CommonVariables.chimeLoaded && CommonVariables.playChimeSound)
+            play(CommonVariables.saveSound, CommonVariables.volume, CommonVariables.volume, 1, 0, 1f)
     }
 
     /**
      * Check for tap sound to be loaded and it in preferences
      */
     fun playSetSound() {
-        if (commonVariables.tapLoaded && commonVariables.playTapSound)
-            play(commonVariables.tapSound, commonVariables.volume, commonVariables.volume, 1, 0, 1f)
+        if (CommonVariables.tapLoaded && CommonVariables.playTapSound)
+            play(CommonVariables.tapSound, CommonVariables.volume, CommonVariables.volume, 1, 0, 1f)
     }
 
     /**
@@ -40,8 +39,8 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     fun init() {
         setOnLoadCompleteListener(this)
-        commonVariables.saveSound = load(context, R.raw.imagesaved, 1)
-        commonVariables.tapSound = load(context, R.raw.tap, 1)
+        CommonVariables.saveSound = load(context, R.raw.imagesaved, 1)
+        CommonVariables.tapSound = load(context, R.raw.tap, 1)
     }
 
     /**
@@ -53,8 +52,8 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     override fun onLoadComplete(soundPool: SoundPool, sampleId: Int, status: Int) {
         if (sampleId == TAP)
-            commonVariables.tapLoaded = true
+            CommonVariables.tapLoaded = true
         else if (sampleId == CHIME)
-            commonVariables.chimeLoaded = true
+            CommonVariables.chimeLoaded = true
     }
 }

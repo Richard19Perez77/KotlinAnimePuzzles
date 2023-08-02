@@ -19,7 +19,6 @@ import java.io.IOException
 class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.OnErrorListener,
     OnAudioFocusChangeListener, OnCompletionListener {
 
-    private var cv: CommonVariables = CommonVariables.getInstance()
     private var mediaPlayer: MediaPlayer?
     private var path: Uri = Uri.parse(c?.getString(R.string.PATH) + Data.TRACK_01)
     private var am: AudioManager?
@@ -35,7 +34,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
     fun togglePause() {
         if (mediaPlayer!!.isPlaying) {
             mediaPlayer!!.pause()
-            cv.currentSoundPosition = mediaPlayer!!.currentPosition
+            CommonVariables.currentSoundPosition = mediaPlayer!!.currentPosition
             currentState = State.Paused
         } else {
             init()
@@ -73,7 +72,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
      * Begin playing music by getting the track and volume prepared and calling the asych prepare method. Set state to Preparing.
      */
     private fun start() {
-        if (cv.playMusic) {
+        if (CommonVariables.playMusic) {
             result = am!!.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
 
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
@@ -82,8 +81,8 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
                     c?.let { mediaPlayer!!.setDataSource(it, path) }
                     currentState = State.Initialized
                     mediaPlayer!!.setAudioStreamType(AudioManager.STREAM_MUSIC)
-                    mediaPlayer!!.setVolume(cv.volume, cv.volume)
-                    currentVolume = cv.volume
+                    mediaPlayer!!.setVolume(CommonVariables.volume, CommonVariables.volume)
+                    currentVolume = CommonVariables.volume
                     mediaPlayer!!.isLooping = true
                     mediaPlayer!!.prepareAsync()
                     currentState = State.Preparing
@@ -105,9 +104,9 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
         // check for option to play music and resume last position
         if (currentState == State.Preparing) {
             currentState = State.Prepared
-            if (cv.playMusic) {
-                if (cv.currentSoundPosition > 0) {
-                    mediaPlayer!!.seekTo(cv.currentSoundPosition)
+            if (CommonVariables.playMusic) {
+                if (CommonVariables.currentSoundPosition > 0) {
+                    mediaPlayer!!.seekTo(CommonVariables.currentSoundPosition)
                 }
                 if (currentState != State.End && !player.isPlaying) {
                     player.start()
@@ -144,7 +143,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
                 if (mediaPlayer == null) init() else if (!mediaPlayer!!.isPlaying) {
                     start()
                 } else {
-                    mediaPlayer!!.setVolume(cv.volume, cv.volume)
+                    mediaPlayer!!.setVolume(CommonVariables.volume, CommonVariables.volume)
                 }
 
             AudioManager.AUDIOFOCUS_LOSS ->                 // lost focus for an unbounded amount of time. stop and release
@@ -154,7 +153,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
                 if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
                     mediaPlayer!!.pause()
                     currentState = State.Paused
-                    cv.currentSoundPosition = mediaPlayer!!.currentPosition
+                    CommonVariables.currentSoundPosition = mediaPlayer!!.currentPosition
                 }
 
             AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK -> if (mediaPlayer != null) {
@@ -187,7 +186,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
             if (mediaPlayer!!.isPlaying) {
                 mediaPlayer!!.pause()
                 currentState = State.Paused
-                cv.currentSoundPosition = mediaPlayer!!.currentPosition
+                CommonVariables.currentSoundPosition = mediaPlayer!!.currentPosition
             }
             if (currentState == State.Started || currentState == State.Paused) {
                 mediaPlayer!!.stop()
@@ -228,7 +227,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
      */
     override fun onCompletion(mp: MediaPlayer) {
         currentState = State.PlaybackCompleted
-        cv.currentSoundPosition = 0
+        CommonVariables.currentSoundPosition = 0
         start()
     }
 
@@ -239,7 +238,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
         if (mediaPlayer != null && mediaPlayer!!.isPlaying) {
             mediaPlayer!!.pause()
             currentState = State.Paused
-            cv.currentSoundPosition = mediaPlayer!!.currentPosition
+            CommonVariables.currentSoundPosition = mediaPlayer!!.currentPosition
         }
     }
 }

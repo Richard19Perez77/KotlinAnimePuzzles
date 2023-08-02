@@ -17,8 +17,6 @@ class SecondFragment : Fragment() {
         const val TAG = "com.updated.puzzles.PuzzleStatsFragment"
     }
 
-    var common = CommonVariables.getInstance()
-
     private var _binding: FragmentSecondBinding? = null
 
     // This property is only valid between onCreateView and
@@ -47,52 +45,52 @@ class SecondFragment : Fragment() {
 
     fun updatePuzzleStats() {
 
-        var temp = "" + common.puzzlesSolved
+        var temp = "" + CommonVariables.puzzlesSolved
         binding.puzzlesSolvedCountTextView.text = temp
 
-        temp = "" + common.fourPiecePuzzleSolvedCount
+        temp = "" + CommonVariables.fourPiecePuzzleSolvedCount
         binding.twoXtwoPuzzlesSolvedTextView.text = temp
 
-        temp = "" + common.fourRecordSolveTime / 1000.0 + " sec."
+        temp = "" + CommonVariables.fourRecordSolveTime / 1000.0 + " sec."
         binding.twoXtwoSolveTimeTextView.text = temp
 
-        temp = "" + common.ninePiecePuzzleSolvedCount
+        temp = "" + CommonVariables.ninePiecePuzzleSolvedCount
         binding.threeXthreePuzzlesSolvedTextView.text = temp
 
-        temp = "" + common.nineRecordSolveTime / 1000.0 + " sec."
+        temp = "" + CommonVariables.nineRecordSolveTime / 1000.0 + " sec."
         binding.threeXthreeSolveTimeTextView.text = temp
 
-        temp = "" + common.sixteenPiecePuzzleSolvedCount
+        temp = "" + CommonVariables.sixteenPiecePuzzleSolvedCount
         binding.fourXfourPuzzlesSolvedTextView.text = temp
 
-        temp = "" + common.sixteenRecordSolveTime / 1000.0 + " sec."
+        temp = "" + CommonVariables.sixteenRecordSolveTime / 1000.0 + " sec."
         binding.fourXfourSolveTimeTextView.text = temp
 
-        temp = "" + common.twentyfivePiecePuzzleSolvedCount
+        temp = "" + CommonVariables.twentyfivePiecePuzzleSolvedCount
         binding.fiveXfivePuzzlesSolvedTextView.text = temp
 
-        temp = "" + common.twentyfiveRecordSolveTime / 1000.0 + " sec."
+        temp = "" + CommonVariables.twentyfiveRecordSolveTime / 1000.0 + " sec."
         binding.fiveXfiveSolveTimeTextView.text = temp
 
-        temp = "" + common.thirtysixPiecePuzzleSolvedCount
+        temp = "" + CommonVariables.thirtysixPiecePuzzleSolvedCount
         binding.sixXsixPuzzlesSolvedTextView.text = temp
 
-        temp = "" + common.thirtysixRecordsSolveTime / 1000.0 + " sec."
+        temp = "" + CommonVariables.thirtysixRecordsSolveTime / 1000.0 + " sec."
         binding.sixXsixSolveTimeTextView.text = temp
 
-        temp = "" + common.fourtyninePiecePuzzleSolvedCount
+        temp = "" + CommonVariables.fourtyninePiecePuzzleSolvedCount
         binding.sevenXsevenPuzzlesSovedTextView.text = temp
 
-        temp = "" + common.fourtynineRecordsSolveTime / 1000.0 + " sec."
+        temp = "" + CommonVariables.fourtynineRecordsSolveTime / 1000.0 + " sec."
         binding.sevenXsevenSolveTimeTextView.text = temp
 
-        temp = "" + common.imagesSaved
+        temp = "" + CommonVariables.imagesSaved
         binding.imageSavedTextView.text = temp
 
-        temp = "" + common.blogLinksTraversed
+        temp = "" + CommonVariables.blogLinksTraversed
         binding.blogLinksTraversedTextView.text = temp
 
-        temp = "" + common.musicSaved
+        temp = "" + CommonVariables.musicSaved
         binding.musicSavedTextView.text = temp
     }
 

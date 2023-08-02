@@ -56,19 +56,18 @@ class FirstFragment : Fragment() {
     lateinit var mySoundPool: MySoundPool
     lateinit var sharedpreferences: SharedPreferences
     lateinit var noisyAudioStreamReceiver: NoisyAudioStreamReceiver
-    var common = CommonVariables.getInstance()
 
     private val intentFilter = IntentFilter(
         AudioManager.ACTION_AUDIO_BECOMING_NOISY
     )
 
     private fun startPlayback() {
-        if (common.isLogging) Log.d(PUZZLE_LOG, "startPlayback NoisyAudioStreamReceiver")
+        if (CommonVariables.isLogging) Log.d(PUZZLE_LOG, "startPlayback NoisyAudioStreamReceiver")
         activity?.registerReceiver(noisyAudioStreamReceiver, intentFilter)
     }
 
     private fun stopPlayback() {
-        if (common.isLogging) Log.d(PUZZLE_LOG, "stopPlayback NoisyAudioStreamReceiver")
+        if (CommonVariables.isLogging) Log.d(PUZZLE_LOG, "stopPlayback NoisyAudioStreamReceiver")
         activity?.unregisterReceiver(noisyAudioStreamReceiver)
     }
 
@@ -83,7 +82,7 @@ class FirstFragment : Fragment() {
      */
     inner class NoisyAudioStreamReceiver : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
-            if (common.isLogging) {
+            if (CommonVariables.isLogging) {
                 Log.d(PUZZLE_LOG, "onReceive NoisyAudioStreamReceiver")
             }
 
@@ -139,7 +138,7 @@ class FirstFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        common.res = requireContext().resources
+        CommonVariables.res = requireContext().resources
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -153,8 +152,8 @@ class FirstFragment : Fragment() {
             hideButtons()
             val intent2 = Intent(Intent.ACTION_VIEW)
             intent2.data =
-                Uri.parse(common.data.artworks[common.currentPuzzleImagePosition].urlOfArtist)
-            common.blogLinksTraversed++
+                Uri.parse(CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].urlOfArtist)
+            CommonVariables.blogLinksTraversed++
             startActivity(intent2)
         }
 
@@ -162,13 +161,13 @@ class FirstFragment : Fragment() {
             hideButtons()
             val intent1 = Intent(Intent.ACTION_VIEW)
             intent1.data = Uri.parse(context?.getString(R.string.wordpress_link))
-            common.blogLinksTraversed++
+            CommonVariables.blogLinksTraversed++
             context?.startActivity(intent1)
         }
 
         binding.nextButton.setOnClickListener {
             hideButtons()
-            common.isImageLoaded = false
+            CommonVariables.isImageLoaded = false
             binding.puzzle.puzzle?.getNewImageLoadedScaledDivided()
 
             val animation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
@@ -254,7 +253,7 @@ class FirstFragment : Fragment() {
                 out!!.close()
             }
             cachedImgFile.delete()
-            common.musicSaved++
+            CommonVariables.musicSaved++
             return@withContext true
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
@@ -280,7 +279,7 @@ class FirstFragment : Fragment() {
         ) {
             requestReadWritePermission(MainActivity.WRITE_EXTERNAL_STORAGE_IMAGE)
         } else {
-            SavePhoto(context, common.currentPuzzleImagePosition)
+            SavePhoto(context, CommonVariables.currentPuzzleImagePosition)
         }
     }
 
@@ -351,7 +350,7 @@ class FirstFragment : Fragment() {
                 out!!.close()
             }
             cachedImgFile.delete()
-            CommonVariables.getInstance().musicSaved++
+            CommonVariables.musicSaved++
             return@withContext true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -422,11 +421,11 @@ class FirstFragment : Fragment() {
 
         val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-        common.volume =
+        CommonVariables.volume =
             (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
         noisyAudioStreamReceiver = NoisyAudioStreamReceiver()
         startPlayback()
-        if (common.playMusic) {
+        if (CommonVariables.playMusic) {
             myMediaPlayer.resume()
         } else {
             //return sound to device
@@ -448,7 +447,7 @@ class FirstFragment : Fragment() {
      * Get the previous puzzle and stats.
      */
     private fun getSharedPrefs() {
-        if (common.isLogging) Log.d(PUZZLE_LOG, "getSharedPrefs PuzzleFragment")
+        if (CommonVariables.isLogging) Log.d(PUZZLE_LOG, "getSharedPrefs PuzzleFragment")
 
         sharedpreferences = (requireContext().getSharedPreferences(
             getString(R.string.MY_PREFERENCES), Context.MODE_PRIVATE
@@ -466,7 +465,7 @@ class FirstFragment : Fragment() {
             posImage = sharedpreferences.getInt(
                 getString(R.string.IMAGENUMBER), 0
             )
-            if (posImage >= 0 && posImage < common.data.artworks.size) {
+            if (posImage >= 0 && posImage < CommonVariables.data.artworks.size) {
                 isValid = true
             }
         } else {
@@ -483,10 +482,10 @@ class FirstFragment : Fragment() {
         }
 
         // only continue if there is an image from the previous puzzle
-        var slots: String? = ""
+        var slots: String = ""
         if (isValid) {
             if (sharedpreferences.contains(getString(R.string.SLOTS))) {
-                slots = sharedpreferences.getString(getString(R.string.SLOTS), "")
+                slots = sharedpreferences.getString(getString(R.string.SLOTS), "").toString()
                 if (slots == "" || slots!!.length < 2) {
                     isValid = false
                 } else {
@@ -502,7 +501,7 @@ class FirstFragment : Fragment() {
                             isValid = false
                         }
                     }
-                    common.dimensions = Math.sqrt(slotArr.size.toDouble())
+                    CommonVariables.dimensions = Math.sqrt(slotArr.size.toDouble())
                     if (expectedTotal != actualTotal) {
                         isValid = false
                     }
@@ -566,80 +565,80 @@ class FirstFragment : Fragment() {
             }
         }
         if (isValid) {
-            common.currentPuzzleImagePosition = posImage
-            common.currentSoundPosition = posSound
-            common.drawBorders = drawBorders
-            common.playMusic = playMusic
-            common.playChimeSound = playChime
-            common.playTapSound = playTap
-            common.setSlots(slots)
-            common.resumePreviousPuzzle = true
-            common.currPuzzleTime = currentTime
+            CommonVariables.currentPuzzleImagePosition = posImage
+            CommonVariables.currentSoundPosition = posSound
+            CommonVariables.drawBorders = drawBorders
+            CommonVariables.playMusic = playMusic
+            CommonVariables.playChimeSound = playChime
+            CommonVariables.playTapSound = playTap
+            CommonVariables.setSlots(slots)
+            CommonVariables.resumePreviousPuzzle = true
+            CommonVariables.currPuzzleTime = currentTime
         } else {
-            common.resumePreviousPuzzle = false
+            CommonVariables.resumePreviousPuzzle = false
         }
 
         //start of saved stats
         if (sharedpreferences.contains(getString(R.string.PUZZLES_SOLVED))) {
-            common.puzzlesSolved = sharedpreferences.getInt(getString(R.string.PUZZLES_SOLVED), 0)
+            CommonVariables.puzzlesSolved = sharedpreferences.getInt(getString(R.string.PUZZLES_SOLVED), 0)
         }
         if (sharedpreferences.contains(getString(R.string.TWO_SOLVE_COUNT))) {
-            common.fourPiecePuzzleSolvedCount =
+            CommonVariables.fourPiecePuzzleSolvedCount =
                 sharedpreferences.getInt(getString(R.string.TWO_SOLVE_COUNT), 0)
         }
         if (sharedpreferences.contains(getString(R.string.TWO_SOLVE_TIME))) {
-            common.fourRecordSolveTime =
+            CommonVariables.fourRecordSolveTime =
                 sharedpreferences.getLong(getString(R.string.TWO_SOLVE_TIME), 0)
         }
         if (sharedpreferences.contains(getString(R.string.THREE_SOLVE_COUNT))) {
-            common.ninePiecePuzzleSolvedCount =
+            CommonVariables.ninePiecePuzzleSolvedCount =
                 sharedpreferences.getInt(getString(R.string.THREE_SOLVE_COUNT), 0)
         }
         if (sharedpreferences.contains(getString(R.string.THREE_SOLVE_TIME))) {
-            common.nineRecordSolveTime =
+            CommonVariables.nineRecordSolveTime =
                 sharedpreferences.getLong(getString(R.string.THREE_SOLVE_TIME), 0)
         }
         if (sharedpreferences.contains(getString(R.string.FOUR_SOLVE_COUNT))) {
-            common.sixteenPiecePuzzleSolvedCount =
+            CommonVariables.sixteenPiecePuzzleSolvedCount =
                 sharedpreferences.getInt(getString(R.string.FOUR_SOLVE_COUNT), 0)
         }
         if (sharedpreferences.contains(getString(R.string.FOUR_SOLVE_TIME))) {
-            common.sixteenRecordSolveTime =
+            CommonVariables.sixteenRecordSolveTime =
                 sharedpreferences.getLong(getString(R.string.FOUR_SOLVE_TIME), 0)
         }
         if (sharedpreferences.contains(getString(R.string.FIVE_SOLVE_COUNT))) {
-            common.twentyfivePiecePuzzleSolvedCount =
+            CommonVariables.twentyfivePiecePuzzleSolvedCount =
                 sharedpreferences.getInt(getString(R.string.FIVE_SOLVE_COUNT), 0)
         }
         if (sharedpreferences.contains(getString(R.string.FIVE_SOLVE_TIME))) {
-            common.twentyfiveRecordSolveTime =
+            CommonVariables.twentyfiveRecordSolveTime =
                 sharedpreferences.getLong(getString(R.string.FIVE_SOLVE_TIME), 0)
         }
         if (sharedpreferences.contains(getString(R.string.SIX_SOLVE_COUNT))) {
-            common.thirtysixPiecePuzzleSolvedCount =
+            CommonVariables.thirtysixPiecePuzzleSolvedCount =
                 sharedpreferences.getInt(getString(R.string.SIX_SOLVE_COUNT), 0)
         }
         if (sharedpreferences.contains(getString(R.string.SIX_SOLVE_TIME))) {
-            common.thirtysixRecordsSolveTime =
+            CommonVariables.thirtysixRecordsSolveTime =
                 sharedpreferences.getLong(getString(R.string.SIX_SOLVE_TIME), 0)
         }
         if (sharedpreferences.contains(getString(R.string.SEVEN_SOLVE_COUNT))) {
-            common.fourtyninePiecePuzzleSolvedCount =
+            CommonVariables.fourtyninePiecePuzzleSolvedCount =
                 sharedpreferences.getInt(getString(R.string.SEVEN_SOLVE_COUNT), 0)
         }
         if (sharedpreferences.contains(getString(R.string.SEVEN_SOLVE_TIME))) {
-            common.fourtynineRecordsSolveTime =
+            CommonVariables.fourtynineRecordsSolveTime =
                 sharedpreferences.getLong(getString(R.string.SEVEN_SOLVE_TIME), 0)
         }
         if (sharedpreferences.contains(getString(R.string.IMAGES_SAVED))) {
-            common.imagesSaved = sharedpreferences.getInt(getString(R.string.IMAGES_SAVED), 0)
+            CommonVariables.imagesSaved = sharedpreferences.getInt(getString(R.string.IMAGES_SAVED), 0)
         }
         if (sharedpreferences.contains(getString(R.string.BLOG_LINKS_TRAVERSED))) {
-            common.blogLinksTraversed =
+            CommonVariables.blogLinksTraversed =
                 sharedpreferences.getInt(getString(R.string.BLOG_LINKS_TRAVERSED), 0)
         }
         if (sharedpreferences.contains(getString(R.string.MUSIC_SAVED))) {
-            common.musicSaved = sharedpreferences.getInt(getString(R.string.MUSIC_SAVED), 0)
+            CommonVariables.musicSaved = sharedpreferences.getInt(getString(R.string.MUSIC_SAVED), 0)
         }
     }
 
@@ -650,7 +649,7 @@ class FirstFragment : Fragment() {
         binding.puzzle.myMediaPlayer = myMediaPlayer
         mySoundPool = MySoundPool(context, 15, AudioManager.STREAM_MUSIC, 100)
         mySoundPool.init()
-        common.mySoundPool = mySoundPool
+        CommonVariables.mySoundPool = mySoundPool
     }
 
 
@@ -664,36 +663,36 @@ class FirstFragment : Fragment() {
 
     private fun saveSharedPrefs() {
         val slotString = binding.puzzle.slotString
-        val dateLong = common.currPuzzleTime
+        val dateLong = CommonVariables.currPuzzleTime
 
         val editor = sharedpreferences.edit()
-        editor.putInt(getString(R.string.IMAGENUMBER), common.currentPuzzleImagePosition)
+        editor.putInt(getString(R.string.IMAGENUMBER), CommonVariables.currentPuzzleImagePosition)
         editor.putString(getString(R.string.SLOTS), slotString)
-        editor.putBoolean(getString(R.string.SOUND), common.playTapSound)
-        editor.putBoolean(getString(R.string.MUSIC), common.playMusic)
-        editor.putBoolean(getString(R.string.CHIME), common.playChimeSound)
-        editor.putBoolean(getString(R.string.BORDER), common.drawBorders)
-        editor.putInt(getString(R.string.POSITION), common.currentSoundPosition)
-        editor.putInt(getString(R.string.MUSIC_SAVED), common.musicSaved)
+        editor.putBoolean(getString(R.string.SOUND), CommonVariables.playTapSound)
+        editor.putBoolean(getString(R.string.MUSIC), CommonVariables.playMusic)
+        editor.putBoolean(getString(R.string.CHIME), CommonVariables.playChimeSound)
+        editor.putBoolean(getString(R.string.BORDER), CommonVariables.drawBorders)
+        editor.putInt(getString(R.string.POSITION), CommonVariables.currentSoundPosition)
+        editor.putInt(getString(R.string.MUSIC_SAVED), CommonVariables.musicSaved)
         editor.putLong(getString(R.string.TIME), dateLong)
-        editor.putInt(getString(R.string.PUZZLES_SOLVED), common.puzzlesSolved)
-        editor.putInt(getString(R.string.IMAGES_SAVED), common.imagesSaved)
-        editor.putInt(getString(R.string.BLOG_LINKS_TRAVERSED), common.blogLinksTraversed)
-        editor.putInt(getString(R.string.TWO_SOLVE_COUNT), common.fourPiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.TWO_SOLVE_TIME), common.fourRecordSolveTime)
-        editor.putInt(getString(R.string.THREE_SOLVE_COUNT), common.ninePiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.THREE_SOLVE_TIME), common.nineRecordSolveTime)
-        editor.putInt(getString(R.string.FOUR_SOLVE_COUNT), common.sixteenPiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.FOUR_SOLVE_TIME), common.sixteenRecordSolveTime)
-        editor.putInt(getString(R.string.FIVE_SOLVE_COUNT), common.twentyfivePiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.FIVE_SOLVE_TIME), common.twentyfiveRecordSolveTime)
-        editor.putInt(getString(R.string.SIX_SOLVE_COUNT), common.thirtysixPiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.SIX_SOLVE_TIME), common.thirtysixRecordsSolveTime)
+        editor.putInt(getString(R.string.PUZZLES_SOLVED), CommonVariables.puzzlesSolved)
+        editor.putInt(getString(R.string.IMAGES_SAVED), CommonVariables.imagesSaved)
+        editor.putInt(getString(R.string.BLOG_LINKS_TRAVERSED), CommonVariables.blogLinksTraversed)
+        editor.putInt(getString(R.string.TWO_SOLVE_COUNT), CommonVariables.fourPiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.TWO_SOLVE_TIME), CommonVariables.fourRecordSolveTime)
+        editor.putInt(getString(R.string.THREE_SOLVE_COUNT), CommonVariables.ninePiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.THREE_SOLVE_TIME), CommonVariables.nineRecordSolveTime)
+        editor.putInt(getString(R.string.FOUR_SOLVE_COUNT), CommonVariables.sixteenPiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.FOUR_SOLVE_TIME), CommonVariables.sixteenRecordSolveTime)
+        editor.putInt(getString(R.string.FIVE_SOLVE_COUNT), CommonVariables.twentyfivePiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.FIVE_SOLVE_TIME), CommonVariables.twentyfiveRecordSolveTime)
+        editor.putInt(getString(R.string.SIX_SOLVE_COUNT), CommonVariables.thirtysixPiecePuzzleSolvedCount)
+        editor.putLong(getString(R.string.SIX_SOLVE_TIME), CommonVariables.thirtysixRecordsSolveTime)
         editor.putInt(
             getString(R.string.SEVEN_SOLVE_COUNT),
-            common.fourtyninePiecePuzzleSolvedCount
+            CommonVariables.fourtyninePiecePuzzleSolvedCount
         )
-        editor.putLong(getString(R.string.SEVEN_SOLVE_TIME), common.fourtynineRecordsSolveTime)
+        editor.putLong(getString(R.string.SEVEN_SOLVE_TIME), CommonVariables.fourtynineRecordsSolveTime)
         editor.apply()
     }
 
@@ -719,7 +718,7 @@ class FirstFragment : Fragment() {
     }
 
     fun toggleUIOverlay() {
-        if (common.isLogging)
+        if (CommonVariables.isLogging)
             Log.d(TAG, "toggleUIOverlay CommonVariables")
 
         if (binding.nextButton.visibility == View.VISIBLE)
@@ -777,7 +776,7 @@ class FirstFragment : Fragment() {
      * Run a thread on the UI to show the UI views.
      */
     private fun showButtons() {
-        if (common.isLogging) Log.d(TAG, "showButtons CommonVariables")
+        if (CommonVariables.isLogging) Log.d(TAG, "showButtons CommonVariables")
         if (binding.nextButton.visibility == View.INVISIBLE) {
             binding.nextButton.visibility = View.VISIBLE
             binding.nextButton.bringToFront()
@@ -801,9 +800,9 @@ class FirstFragment : Fragment() {
     }
 
     fun updatePhysics() {
-        if (common.isLogging) Log.d(TAG, "updatePhysics PuzzleSurface")
+        if (CommonVariables.isLogging) Log.d(TAG, "updatePhysics PuzzleSurface")
 
-        if (common.isPuzzleSolved) {
+        if (CommonVariables.isPuzzleSolved) {
             val solveTime = "Solve time = " + (binding.puzzle.puzzle?.solveTime ?: 0) + " secs."
             val coroutineScope = CoroutineScope(Dispatchers.Main)
             coroutineScope.launch {

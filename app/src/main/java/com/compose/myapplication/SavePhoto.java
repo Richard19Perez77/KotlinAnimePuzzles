@@ -20,7 +20,6 @@ import java.io.OutputStream;
  */
 public class SavePhoto {
 
-    CommonVariables commonVariables = CommonVariables.getInstance();
     int currentImageToSave;
     Toast toast = null;
 
@@ -64,8 +63,8 @@ public class SavePhoto {
                     File path = Environment
                             .getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 
-                    final String name = commonVariables.data.artworks[currentImageToSave].titleOfArtist + "_"
-                            + commonVariables.data.artworks[currentImageToSave].titleOfArtwork + ".jpeg";
+                    final String name = CommonVariables.data.artworks[currentImageToSave].titleOfArtist + "_"
+                            + CommonVariables.data.artworks[currentImageToSave].titleOfArtwork + ".jpeg";
 
                     File file = new File(path, name);
 
@@ -81,7 +80,7 @@ public class SavePhoto {
 
                                 // get file into input stream
                                 InputStream is = activity.getResources().openRawResource(
-                                        commonVariables.data.artworks[currentImageToSave].imageID);
+                                        CommonVariables.data.artworks[currentImageToSave].imageID);
 
                                 OutputStream os = new FileOutputStream(file);
                                 byte[] data = new byte[is.available()];
@@ -90,7 +89,7 @@ public class SavePhoto {
                                 is.close();
                                 os.close();
 
-                                commonVariables.imagesSaved++;
+                                CommonVariables.imagesSaved++;
                                 MainActivity act = (MainActivity) activity;
                                 act.updatePuzzleStats();
 

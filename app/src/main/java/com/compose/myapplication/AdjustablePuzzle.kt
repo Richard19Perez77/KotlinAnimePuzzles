@@ -18,36 +18,35 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private var pieces = 0
     private var xparts = 0
     private var yparts = 0
-    var common: CommonVariables = CommonVariables.getInstance()
 
     fun getPreviousImageLoadedScaledDivided() {
-        if (common.isLogging) Log.d(TAG, "getPreviousImageLoadedScaledDivided AdjustablePuzzleImpl")
+        if (CommonVariables.isLogging) Log.d(TAG, "getPreviousImageLoadedScaledDivided AdjustablePuzzleImpl")
 
-        common.isPuzzleSplitCorrectly = false
-        common.isPuzzleSolved = false
+        CommonVariables.isPuzzleSplitCorrectly = false
+        CommonVariables.isPuzzleSolved = false
         val thread: Thread = object : Thread() {
             override fun run() {
-                while (!common.isPuzzleSplitCorrectly) {
+                while (!CommonVariables.isPuzzleSplitCorrectly) {
                     // get new index value and then remove index
-                    common.index = common.currentPuzzleImagePosition
-                    common.image = common.decodeSampledBitmapFromResource(
-                        common.res,
-                        common.data.artworks[common.currentPuzzleImagePosition].imageID,
-                        common.screenW, common.screenH
+                    CommonVariables.index = CommonVariables.currentPuzzleImagePosition
+                    CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
+                        CommonVariables.res,
+                        CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
+                        CommonVariables.screenW, CommonVariables.screenH
                     )
-                    common.image = Bitmap.createScaledBitmap(
-                        common.image,
-                        common.screenW, common.screenH, true
+                    CommonVariables.image = Bitmap.createScaledBitmap(
+                        CommonVariables.image!!,
+                        CommonVariables.screenW, CommonVariables.screenH, true
                     )
-                    common.isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
-                    if (common.isPuzzleSplitCorrectly) {
-                        common.isImageError = false
-                        common.mySoundPool.playChimeSound()
-                        common.isImageLoaded = true
+                    CommonVariables.isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
+                    if (CommonVariables.isPuzzleSplitCorrectly) {
+                        CommonVariables.isImageError = false
+                        CommonVariables.mySoundPool?.playChimeSound()
+                        CommonVariables.isImageLoaded = true
                         checkToBeSolved()
                         updateAndDraw()
                     } else {
-                        common.isImageError = true
+                        CommonVariables.isImageError = true
                     }
                 }
             }
@@ -59,52 +58,52 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * Called when shared preferences are invalid or a new puzzle is selected after the solve of one. Use a loading thread to set up the puzzle off the main thread.
      */
     fun getNewImageLoadedScaledDivided() {
-        if (common.isLogging) Log.d(TAG, "getNewImageLoadedScaledDivided AdjustablePuzzleImpl")
+        if (CommonVariables.isLogging) Log.d(TAG, "getNewImageLoadedScaledDivided AdjustablePuzzleImpl")
 
-        common.isPuzzleSplitCorrectly = false
-        common.isPuzzleSolved = false
+        CommonVariables.isPuzzleSplitCorrectly = false
+        CommonVariables.isPuzzleSolved = false
 
         val thread: Thread = object : Thread() {
             override fun run() {
-                while (!common.isPuzzleSplitCorrectly) {
+                while (!CommonVariables.isPuzzleSplitCorrectly) {
 
                     // fill with all valid numbers
-                    if (common.imagesShown.isEmpty()) for (i in common.data.artworks.indices) common.imagesShown.add(
+                    if (CommonVariables.imagesShown.isEmpty()) for (i in CommonVariables.data.artworks.indices) CommonVariables.imagesShown.add(
                         i
                     )
 
                     // get new index value from remaining images
-                    common.index = common.rand.nextInt(common.imagesShown.size)
+                    CommonVariables.index = CommonVariables.rand.nextInt(CommonVariables.imagesShown.size)
 
                     //edit to change to a direct image
-                    //common.index = 141;
+                    //CommonVariables.index = 141;
 
                     // get the value at that index for new imageID
-                    common.currentPuzzleImagePosition = common.imagesShown[common.index]
+                    CommonVariables.currentPuzzleImagePosition = CommonVariables.imagesShown[CommonVariables.index]
 
                     // remove from list to prevent duplicates
-                    common.imagesShown.removeAt(common.index)
+                    CommonVariables.imagesShown.removeAt(CommonVariables.index)
 
                     // start decoding and scaling
-                    common.image = common.decodeSampledBitmapFromResource(
-                        common.res,
-                        common.data.artworks[common.currentPuzzleImagePosition].imageID,
-                        common.screenW, common.screenH
+                    CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
+                        CommonVariables.res,
+                        CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
+                        CommonVariables.screenW, CommonVariables.screenH
                     )
-                    common.image = Bitmap.createScaledBitmap(
-                        common.image,
-                        common.screenW, common.screenH, true
+                    CommonVariables.image = Bitmap.createScaledBitmap(
+                        CommonVariables.image!!,
+                        CommonVariables.screenW, CommonVariables.screenH, true
                     )
-                    common.isPuzzleSplitCorrectly = divideBitmap()
-                    if (common.isPuzzleSplitCorrectly) {
+                    CommonVariables.isPuzzleSplitCorrectly = divideBitmap()
+                    if (CommonVariables.isPuzzleSplitCorrectly) {
                         resetTimer()
-                        common.isImageError = false
-                        common.mySoundPool.playChimeSound()
-                        common.isImageLoaded = true
+                        CommonVariables.isImageError = false
+                        CommonVariables.mySoundPool?.playChimeSound()
+                        CommonVariables.isImageLoaded = true
                         checkToBeSolved()
                         updateAndDraw()
                     } else {
-                        common.isImageError = true
+                        CommonVariables.isImageError = true
                     }
                 }
             }
@@ -118,15 +117,15 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private fun switchEveryIndexWithRandomIndex() {
 
         // for every slot index
-        for (i in common.slotOrder.indices) {
+        for (i in CommonVariables.slotOrder.indices) {
             // get a new index
-            val switchIndex = common.rand.nextInt(common.slotOrder.size)
+            val switchIndex = CommonVariables.rand.nextInt(CommonVariables.slotOrder.size)
             // save original index
-            val tempValue = common.slotOrder[i]
+            val tempValue = CommonVariables.slotOrder[i]
             // set new index into it
-            common.slotOrder[i] = common.slotOrder[switchIndex]
+            CommonVariables.slotOrder[i] = CommonVariables.slotOrder[switchIndex]
             // set original to the new index
-            common.slotOrder[switchIndex] = tempValue
+            CommonVariables.slotOrder[switchIndex] = tempValue
         }
     }
 
@@ -134,35 +133,35 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * Find the sides of the device and split the puzzle into sections evenly across each side.
      */
     private fun assignXandYtoBorderPointIndex() {
-        common.evenlySplit = false
-        while (!common.evenlySplit) {
+        CommonVariables.evenlySplit = false
+        while (!CommonVariables.evenlySplit) {
             // get screen width and height to start splitting
             var w = 0
-            if (null != common.image) w = common.image.width
+            if (null != CommonVariables.image) w = CommonVariables.image!!.width
             var h = 0
-            if (common.image != null) h = common.image.height
+            if (CommonVariables.image != null) h = CommonVariables.image!!.height
             val pieceW = w / xparts
             val pieceH = h / yparts
-            common.xs = IntArray(xparts)
+            CommonVariables.xs = IntArray(xparts)
             for (i in 0 until xparts) {
-                common.xs[i] = pieceW * i
+                CommonVariables.xs[i] = pieceW * i
             }
-            common.ys = IntArray(yparts)
+            CommonVariables.ys = IntArray(yparts)
             for (i in 0 until yparts) {
-                common.ys[i] = pieceH * i
+                CommonVariables.ys[i] = pieceH * i
             }
             var acc = 0
-            for (i in common.ys.indices) {
-                val tempy = common.ys[i]
-                for (j in common.xs.indices) {
-                    val tempx = common.xs[j]
+            for (i in CommonVariables.ys.indices) {
+                val tempy = CommonVariables.ys[i]
+                for (j in CommonVariables.xs.indices) {
+                    val tempx = CommonVariables.xs[j]
                     setBorderPoint(acc, tempx, tempy)
                     setBitmapToPiece(acc, tempx, tempy, pieceW, pieceH)
                     setPointsToSlotAndPiece(acc, tempx, tempy, pieceW, pieceH)
                     acc++
                 }
             }
-            common.evenlySplit = true
+            CommonVariables.evenlySplit = true
         }
     }
 
@@ -176,7 +175,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private fun setBorderPoint(i: Int, x: Int, y: Int) {
         // add point to array for x and y of each division intersection of pieces
         val newPoint = Point(x, y)
-        common.points[i] = newPoint
+        CommonVariables.points[i] = newPoint
     }
 
     /**
@@ -185,11 +184,11 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * @return
      */
     fun divideBitmapFromPreviousPuzzle(): Boolean {
-        common.initPrevDivideBitmap(pieces)
-        common.piecesComplete = 0
+        CommonVariables.initPrevDivideBitmap(pieces)
+        CommonVariables.piecesComplete = 0
         assignXandYtoBorderPointIndex()
-        common.assignSlotOrder()
-        return common.piecesComplete == pieces
+        CommonVariables.assignSlotOrder()
+        return CommonVariables.piecesComplete == pieces
     }
 
     /**
@@ -198,15 +197,15 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * @return
      */
     fun divideBitmap(): Boolean {
-        common.initDivideBitmap(pieces)
-        common.piecesComplete = 0
+        CommonVariables.initDivideBitmap(pieces)
+        CommonVariables.piecesComplete = 0
         assignXandYtoBorderPointIndex()
         var randomSlots: Boolean
         do {
             switchEveryIndexWithRandomIndex()
-            randomSlots = common.assignSlotOrder()
+            randomSlots = CommonVariables.assignSlotOrder()
         } while (!randomSlots)
-        return common.piecesComplete == pieces
+        return CommonVariables.piecesComplete == pieces
     }
 
     /**
@@ -219,18 +218,18 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * @param bitmapH
      */
     private fun setPointsToSlotAndPiece(i: Int, x: Int, y: Int, bitmapW: Int, bitmapH: Int) {
-        common.puzzlePieces[i].px = x
-        common.puzzlePieces[i].px2 = x + bitmapW
-        common.puzzlePieces[i].py = y
-        common.puzzlePieces[i].py2 = y + bitmapH
-        common.puzzleSlots[i].sx = x
-        common.puzzleSlots[i].sx2 = x + bitmapW
-        common.puzzleSlots[i].sy = y
-        common.puzzleSlots[i].sy2 = y + bitmapH
-        common.puzzleSlots[i].puzzlePiece = common.puzzlePieces[i]
-        common.puzzleSlots[i].puzzlePiece.pieceNum = i
-        common.puzzleSlots[i].slotNum = common.puzzleSlots[i].puzzlePiece.pieceNum
-        common.piecesComplete++
+        CommonVariables.puzzlePieces[i]?.px = x
+        CommonVariables.puzzlePieces[i]?.px2 = x + bitmapW
+        CommonVariables.puzzlePieces[i]?.py = y
+        CommonVariables.puzzlePieces[i]?.py2 = y + bitmapH
+        CommonVariables.puzzleSlots[i]?.sx = x
+        CommonVariables.puzzleSlots[i]?.sx2 = x + bitmapW
+        CommonVariables.puzzleSlots[i]?.sy = y
+        CommonVariables.puzzleSlots[i]?.sy2 = y + bitmapH
+        CommonVariables.puzzleSlots[i]?.puzzlePiece = CommonVariables.puzzlePieces[i]!!
+        CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum = i
+        CommonVariables.puzzleSlots[i]?.slotNum = CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum!!
+        CommonVariables.piecesComplete++
     }
 
     /**
@@ -243,14 +242,16 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * @param bitmapH
      */
     private fun setBitmapToPiece(i: Int, x: Int, y: Int, bitmapW: Int, bitmapH: Int) {
-        if (common.puzzlePieces[i].bitmap != null) {
-            common.puzzlePieces[i].bitmap!!.recycle()
+        if (CommonVariables.puzzlePieces[i]?.bitmap != null) {
+            CommonVariables.puzzlePieces[i]?.bitmap!!.recycle()
         }
-        common.puzzlePieces[i].bitmap = null
-        common.puzzlePieces[i].bitmap = Bitmap.createBitmap(
-            common.image, x, y,
-            bitmapW, bitmapH
-        )
+        CommonVariables.puzzlePieces[i]?.bitmap = null
+        CommonVariables.puzzlePieces[i]?.bitmap = CommonVariables.image?.let {
+            Bitmap.createBitmap(
+                it, x, y,
+                bitmapW, bitmapH
+            )
+        }
     }
 
     /**
@@ -271,53 +272,53 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         if (event.action == MotionEvent.ACTION_DOWN) {
             val downX = event.x.toInt()
             val downY = event.y.toInt()
-            if (downX > common.screenW || downX < 0) return false
-            if (downY > common.screenH || downY < 0) return false
-            common.movingPiece = false
+            if (downX > CommonVariables.screenW || downX < 0) return false
+            if (downY > CommonVariables.screenH || downY < 0) return false
+            CommonVariables.movingPiece = false
 
             // get x index
             var xIndex = 0
-            for (i in common.xs.indices) {
-                if (downX >= common.xs[i]) {
+            for (i in CommonVariables.xs.indices) {
+                if (downX >= CommonVariables.xs[i]) {
                     xIndex = i
                 }
             }
 
             // get y index
             var yIndex = 0
-            for (i in common.ys.indices) {
-                if (downY >= common.ys[i]) {
+            for (i in CommonVariables.ys.indices) {
+                if (downY >= CommonVariables.ys[i]) {
                     yIndex = i
                 }
             }
 
             //find the piece based on x and y matrix
-            common.currSlotOnTouchDown = xIndex + yparts * yIndex
+            CommonVariables.currSlotOnTouchDown = xIndex + yparts * yIndex
         } else if (event.action == MotionEvent.ACTION_MOVE) {
             // the moving piece has its own coordinates
             val moveX = event.x.toInt()
             val moveY = event.y.toInt()
             var invalidMovePosition = false
-            if (moveX > common.screenW || moveX < 0) invalidMovePosition = true
-            if (moveY > common.screenH || moveY < 0) invalidMovePosition = true
+            if (moveX > CommonVariables.screenW || moveX < 0) invalidMovePosition = true
+            if (moveY > CommonVariables.screenH || moveY < 0) invalidMovePosition = true
             if (invalidMovePosition) {
-                common.movingPiece = false
-                common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.px =
-                    common.puzzleSlots[common.currSlotOnTouchDown].sx
-                common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.py =
-                    common.puzzleSlots[common.currSlotOnTouchDown].sy
+                CommonVariables.movingPiece = false
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px =
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sx!!
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py =
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy!!
                 updateAndDraw()
                 return false
             }
 
             // get moving piece and center it on user touch point
-            common.movingPiece = true
-            if (common.currSlotOnTouchDown in 0 until pieces) {
-                common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.px = (moveX
-                        - (common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap
+            CommonVariables.movingPiece = true
+            if (CommonVariables.currSlotOnTouchDown in 0 until pieces) {
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px  = (moveX
+                        - (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
                     ?.width ?: 0) / 2)
-                common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.py = (moveY
-                        - (common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.bitmap
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py = (moveY
+                        - (CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.bitmap
                     ?.height ?: 0) / 2)
             }
             updateAndDraw()
@@ -325,66 +326,66 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
             //the up action means it may be time to switch pieces store the new up coords
             val upX = event.x.toInt()
             val upY = event.y.toInt()
-            common.movingPiece = false
+            CommonVariables.movingPiece = false
             var invalidSetPosition = false
-            if (upX > common.screenW || upX < 0) invalidSetPosition = true
-            if (upY > common.screenH || upY < 0) invalidSetPosition = true
+            if (upX > CommonVariables.screenW || upX < 0) invalidSetPosition = true
+            if (upY > CommonVariables.screenH || upY < 0) invalidSetPosition = true
             if (invalidSetPosition) {
-                common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.px =
-                    common.puzzleSlots[common.currSlotOnTouchDown].sx
-                common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.py =
-                    common.puzzleSlots[common.currSlotOnTouchDown].sy
-                common.playSetSound()
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px =
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sx!!
+                CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py =
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy!!
+                CommonVariables.playSetSound()
                 updateAndDraw()
                 return false
             } else {
                 // get x index
                 var xIndex = 0
-                for (i in common.xs.indices) {
-                    if (upX >= common.xs[i]) {
+                for (i in CommonVariables.xs.indices) {
+                    if (upX >= CommonVariables.xs[i]) {
                         xIndex = i
                     }
                 }
 
                 // get y index
                 var yIndex = 0
-                for (i in common.ys.indices) {
-                    if (upY >= common.ys[i]) {
+                for (i in CommonVariables.ys.indices) {
+                    if (upY >= CommonVariables.ys[i]) {
                         yIndex = i
                     }
                 }
-                common.currSlotOnTouchUp = xIndex + yparts * yIndex
+                CommonVariables.currSlotOnTouchUp = xIndex + yparts * yIndex
 
                 // check for new location to not be the original before setting
-                if (common.currSlotOnTouchDown != common.currSlotOnTouchUp) {
-                    common.sendPieceToNewSlot(
-                        common.currSlotOnTouchDown,
-                        common.currSlotOnTouchUp
+                if (CommonVariables.currSlotOnTouchDown != CommonVariables.currSlotOnTouchUp) {
+                    CommonVariables.sendPieceToNewSlot(
+                        CommonVariables.currSlotOnTouchDown,
+                        CommonVariables.currSlotOnTouchUp
                     )
                 } else {
                     // simply return the moving piece to its original x and y
-                    common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.px =
-                        common.puzzleSlots[common.currSlotOnTouchDown].sx
-                    common.puzzleSlots[common.currSlotOnTouchDown].puzzlePiece.py =
-                        common.puzzleSlots[common.currSlotOnTouchDown].sy
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.px =
+                        CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sx!!
+                    CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py =
+                        CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy!!
                 }
-                common.playSetSound()
+                CommonVariables.playSetSound()
 
                 // check for all images to by in place
-                common.inPlace = 0
-                for (i in 0 until common.numberOfPieces) {
-                    if (common.puzzleSlots[i].slotNum == common.puzzleSlots[i].puzzlePiece.pieceNum) {
-                        common.inPlace++
+                CommonVariables.inPlace = 0
+                for (i in 0 until CommonVariables.numberOfPieces) {
+                    if (CommonVariables.puzzleSlots[i]?.slotNum == CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum) {
+                        CommonVariables.inPlace++
                     }
                 }
 
                 // if all in place set as isPuzzleSolved
-                if (common.inPlace == common.numberOfPieces) {
+                if (CommonVariables.inPlace == CommonVariables.numberOfPieces) {
                     addTimeToTimer()
-                    common.isPuzzleSolved = true
+                    CommonVariables.isPuzzleSolved = true
 
                     //increment stats
-                    common.puzzlesSolved++
+                    CommonVariables.puzzlesSolved++
                     incrementPuzzleSolveByPuzzleSize()
                     compareRecordTime()
 
@@ -406,12 +407,12 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      */
     private fun incrementPuzzleSolveByPuzzleSize() {
         when (pieces) {
-            4 -> common.fourPiecePuzzleSolvedCount++
-            9 -> common.ninePiecePuzzleSolvedCount++
-            16 -> common.sixteenPiecePuzzleSolvedCount++
-            25 -> common.twentyfivePiecePuzzleSolvedCount++
-            36 -> common.thirtysixPiecePuzzleSolvedCount++
-            49 -> common.fourtyninePiecePuzzleSolvedCount++
+            4 -> CommonVariables.fourPiecePuzzleSolvedCount++
+            9 -> CommonVariables.ninePiecePuzzleSolvedCount++
+            16 -> CommonVariables.sixteenPiecePuzzleSolvedCount++
+            25 -> CommonVariables.twentyfivePiecePuzzleSolvedCount++
+            36 -> CommonVariables.thirtysixPiecePuzzleSolvedCount++
+            49 -> CommonVariables.fourtyninePiecePuzzleSolvedCount++
         }
     }
 
@@ -419,11 +420,11 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * Used to recycle all bitmaps used in pieces
      */
     fun recylceAll() {
-        if (common.image != null) common.image.recycle()
-        for (i in common.puzzlePieces.indices) {
-            if (common.puzzlePieces[i] != null) {
-                if (common.puzzlePieces[i].bitmap != null) {
-                    common.puzzlePieces[i].bitmap!!.recycle()
+        if (CommonVariables.image != null) CommonVariables.image!!.recycle()
+        for (i in CommonVariables.puzzlePieces.indices) {
+            if (CommonVariables.puzzlePieces[i] != null) {
+                if (CommonVariables.puzzlePieces[i]?.bitmap != null) {
+                    CommonVariables.puzzlePieces[i]?.bitmap!!.recycle()
                 }
             }
         }
@@ -433,9 +434,9 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * Add time to the timer for the current puzzle.
      */
     private fun addTimeToTimer() {
-        if (!common.isPuzzleSolved) {
-            common.stopPuzzle = Date()
-            common.currPuzzleTime += (common.stopPuzzle.time - common.startPuzzle.time)
+        if (!CommonVariables.isPuzzleSolved) {
+            CommonVariables.stopPuzzle = Date()
+            CommonVariables.currPuzzleTime += (CommonVariables.stopPuzzle.time - CommonVariables.startPuzzle.time)
         }
     }
 
@@ -444,28 +445,28 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      */
     private fun compareRecordTime() {
         when (pieces) {
-            4 -> if (common.fourRecordSolveTime > common.currPuzzleTime || common.fourRecordSolveTime == 0L) {
-                common.fourRecordSolveTime = common.currPuzzleTime
+            4 -> if (CommonVariables.fourRecordSolveTime > CommonVariables.currPuzzleTime || CommonVariables.fourRecordSolveTime == 0L) {
+                CommonVariables.fourRecordSolveTime = CommonVariables.currPuzzleTime
             }
 
-            9 -> if (common.nineRecordSolveTime > common.currPuzzleTime || common.nineRecordSolveTime == 0L) {
-                common.nineRecordSolveTime = common.currPuzzleTime
+            9 -> if (CommonVariables.nineRecordSolveTime > CommonVariables.currPuzzleTime || CommonVariables.nineRecordSolveTime == 0L) {
+                CommonVariables.nineRecordSolveTime = CommonVariables.currPuzzleTime
             }
 
-            16 -> if (common.sixteenRecordSolveTime > common.currPuzzleTime || common.sixteenRecordSolveTime == 0L) {
-                common.sixteenRecordSolveTime = common.currPuzzleTime
+            16 -> if (CommonVariables.sixteenRecordSolveTime > CommonVariables.currPuzzleTime || CommonVariables.sixteenRecordSolveTime == 0L) {
+                CommonVariables.sixteenRecordSolveTime = CommonVariables.currPuzzleTime
             }
 
-            25 -> if (common.twentyfiveRecordSolveTime > common.currPuzzleTime || common.twentyfiveRecordSolveTime == 0L) {
-                common.twentyfiveRecordSolveTime = common.currPuzzleTime
+            25 -> if (CommonVariables.twentyfiveRecordSolveTime > CommonVariables.currPuzzleTime || CommonVariables.twentyfiveRecordSolveTime == 0L) {
+                CommonVariables.twentyfiveRecordSolveTime = CommonVariables.currPuzzleTime
             }
 
-            36 -> if (common.thirtysixRecordsSolveTime > common.currPuzzleTime || common.thirtysixRecordsSolveTime == 0L) {
-                common.thirtysixRecordsSolveTime = common.currPuzzleTime
+            36 -> if (CommonVariables.thirtysixRecordsSolveTime > CommonVariables.currPuzzleTime || CommonVariables.thirtysixRecordsSolveTime == 0L) {
+                CommonVariables.thirtysixRecordsSolveTime = CommonVariables.currPuzzleTime
             }
 
-            49 -> if (common.fourtynineRecordsSolveTime > common.currPuzzleTime || common.fourtynineRecordsSolveTime == 0L) {
-                common.fourtynineRecordsSolveTime = common.currPuzzleTime
+            49 -> if (CommonVariables.fourtynineRecordsSolveTime > CommonVariables.currPuzzleTime || CommonVariables.fourtynineRecordsSolveTime == 0L) {
+                CommonVariables.fourtynineRecordsSolveTime = CommonVariables.currPuzzleTime
             }
         }
     }
@@ -474,8 +475,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * Reset the current puzzle solve timer.
      */
     fun resetTimer() {
-        common.currPuzzleTime = 0
-        common.startPuzzle = Date()
+        CommonVariables.currPuzzleTime = 0
+        CommonVariables.startPuzzle = Date()
     }
 
     val solveTime: Double
@@ -484,7 +485,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
          *
          * @return
          */
-        get() = common.currPuzzleTime / 1000.0
+        get() = CommonVariables.currPuzzleTime / 1000.0
 
     /**
      * On pause of the application update the current running time.
@@ -508,14 +509,14 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * If all pieces are in the correct slot the puzzle is solved.
      */
     fun checkToBeSolved() {
-        common.inPlace = 0
-        for (i in 0 until common.numberOfPieces) {
-            if (common.puzzleSlots[i].slotNum == common.puzzleSlots[i].puzzlePiece.pieceNum) {
-                common.inPlace++
+        CommonVariables.inPlace = 0
+        for (i in 0 until CommonVariables.numberOfPieces) {
+            if (CommonVariables.puzzleSlots[i]?.slotNum == CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum) {
+                CommonVariables.inPlace++
             }
         }
-        if (common.inPlace == common.numberOfPieces) {
-            common.isPuzzleSolved = true
+        if (CommonVariables.inPlace == CommonVariables.numberOfPieces) {
+            CommonVariables.isPuzzleSolved = true
         }
     }
 
