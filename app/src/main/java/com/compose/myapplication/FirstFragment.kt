@@ -415,8 +415,8 @@ class FirstFragment : Fragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         getSharedPrefs()
     }
 
@@ -658,17 +658,14 @@ class FirstFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-
+        saveSharedPrefs()
         stopPlayback()
 
         myMediaPlayer.pause()
         binding.puzzle.onPause()
     }
 
-    override fun onStop() {
-        super.onStop()
-        myMediaPlayer.onStop()
-
+    private fun saveSharedPrefs() {
         val slotString = binding.puzzle.slotString
         val dateLong = common.currPuzzleTime
 
@@ -701,6 +698,11 @@ class FirstFragment : Fragment() {
         )
         editor.putLong(getString(R.string.SEVEN_SOLVE_TIME), common.fourtynineRecordsSolveTime)
         editor.apply()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        myMediaPlayer.onStop()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
