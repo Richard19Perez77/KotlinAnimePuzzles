@@ -1,18 +1,9 @@
 package com.compose.myapplication;
 
-import android.app.Activity;
-import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Point;
-import android.util.Log;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
-import android.widget.TextView;
-
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -217,7 +208,7 @@ public class CommonVariables {
      * Play sound for setting puzzle pieces
      */
     public void playSetSound() {
-        // mySoundPool.playSetSound();
+        mySoundPool.playSetSound();
     }
 
     /**

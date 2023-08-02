@@ -79,7 +79,8 @@ public class PuzzleSurface extends SurfaceView implements
      */
     @Override
     public void onWindowFocusChanged(boolean hasWindowFocus) {
-        if (common.isLogging) Log.d(TAG, "onWindowFocusChanged PuzzleSurface hasWindowFocus:" + hasWindowFocus);
+        if (common.isLogging)
+            Log.d(TAG, "onWindowFocusChanged PuzzleSurface hasWindowFocus:" + hasWindowFocus);
 
         if (!hasWindowFocus) {
             common.isWindowInFocus = false;
@@ -379,11 +380,6 @@ public class PuzzleSurface extends SurfaceView implements
         public SurfaceHolder getSurfaceHolder() {
             return mSurfaceHolder;
         }
-
-        /**
-         * The UI is updated on solve of a puzzle where the buttons are shown.
-         */
-
 
         /**
          * Draw may include a shadow piece to replace a moving piece.

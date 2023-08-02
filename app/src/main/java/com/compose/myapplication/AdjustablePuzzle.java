@@ -32,7 +32,8 @@ public class AdjustablePuzzle {
      * Called when shared preferences are valid to resume a previous puzzle. Use a loading thread to set up the puzzle off the main thread.
      */
     public void getPreviousImageLoadedScaledDivided() {
-        if (common.isLogging) Log.d(TAG, "getPreviousImageLoadedScaledDivided AdjustablePuzzleImpl");
+        if (common.isLogging)
+            Log.d(TAG, "getPreviousImageLoadedScaledDivided AdjustablePuzzleImpl");
 
         common.isPuzzleSplitCorrectly = false;
         common.isPuzzleSolved = false;
@@ -578,9 +579,5 @@ public class AdjustablePuzzle {
         if (common.inPlace == common.numberOfPieces) {
             common.isPuzzleSolved = true;
         }
-    }
-
-    public void updatePhysics() {
-
     }
 }

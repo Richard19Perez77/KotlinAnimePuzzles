@@ -57,6 +57,11 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, IntentFilter(SaveMusicService.MUSIC_SAVED))
     }
 
+    override fun onPause() {
+        super.onPause()
+        unregisterReceiver(receiver)
+    }
+
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -74,10 +79,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
     }
 
     fun updatePuzzleStats(){
