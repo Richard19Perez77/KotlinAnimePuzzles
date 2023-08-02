@@ -240,7 +240,7 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
      * If playing, stop the media player, record position of sound and set state to Paused.
      */
     public void onStop() {
-        if (mediaPlayer.isPlaying()) {
+        if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.pause();
             currentState = State.Paused;
             cv.currentSoundPosition = mediaPlayer.getCurrentPosition();

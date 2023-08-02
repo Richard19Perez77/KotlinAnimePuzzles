@@ -106,7 +106,7 @@ public class PuzzleSurface extends SurfaceView implements
         if (common.resumePreviousPuzzle) {
             common.resumePreviousPuzzle = false;
             resumePuzzle();
-        } else if (common.createNewPuzzle) {
+        } else  {
             common.createNewPuzzle = false;
             createPuzzle();
         }
