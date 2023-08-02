@@ -72,7 +72,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
     /**
      * Begin playing music by getting the track and volume prepared and calling the asych prepare method. Set state to Preparing.
      */
-    fun start() {
+    private fun start() {
         if (cv.playMusic) {
             result = am!!.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN)
 
