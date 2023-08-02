@@ -456,6 +456,11 @@ class FirstFragment : Fragment() {
             getString(R.string.MY_PREFERENCES), Context.MODE_PRIVATE
         ))
 
+        // clear prefs for testing
+        // val editor = sharedpreferences.edit()
+        // editor.clear()
+        // editor.apply()
+
         // check for all to be loaded here
         var isValid = false
         var posImage = 0
