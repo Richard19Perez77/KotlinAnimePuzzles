@@ -257,7 +257,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * Make a call to the update and draw method in the puzzle surface.
      */
     fun updateAndDraw() {
-        puzzleSurface.puzzleUpdateAndDraw.updateAndDraw()
+        puzzleSurface.puzzleUpdateAndDraw?.updateAndDraw()
     }
 
     /**

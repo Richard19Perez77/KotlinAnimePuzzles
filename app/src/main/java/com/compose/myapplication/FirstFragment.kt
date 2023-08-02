@@ -169,7 +169,7 @@ class FirstFragment : Fragment() {
         binding.nextButton.setOnClickListener {
             hideButtons()
             common.isImageLoaded = false
-            binding.puzzle.puzzle.getNewImageLoadedScaledDivided()
+            binding.puzzle.puzzle?.getNewImageLoadedScaledDivided()
 
             val animation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
             val animationListener: Animation.AnimationListener =
@@ -190,12 +190,12 @@ class FirstFragment : Fragment() {
                 val coroutineScope = CoroutineScope(Dispatchers.Main)
                 coroutineScope.launch {
                     val result = withContext(Dispatchers.IO) {
-                        permissionCheckSaveImage();
+                        permissionCheckSaveImage()
                     }
                     if (result) showToast("Success!") else showToast("Error!")
                 }
             } else {
-                saveImage();
+                saveImage()
             }
         }
 
@@ -204,16 +204,16 @@ class FirstFragment : Fragment() {
                 val coroutineScope = CoroutineScope(Dispatchers.Main)
                 coroutineScope.launch {
                     val result = withContext(Dispatchers.IO) {
-                        permissionCheckSaveMusic();
+                        permissionCheckSaveMusic()
                     }
                     if (result) showToast("Success!") else showToast("Error!")
                 }
             } else {
-                saveMusic();
+                saveMusic()
             }
         }
 
-        binding.puzzle.fragment = this;
+        binding.puzzle.fragment = this
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -221,7 +221,6 @@ class FirstFragment : Fragment() {
         var inputStream: InputStream? = null
         var out: OutputStream? = null
         try {
-            var cachePath = ""
             val path = File(requireContext().externalCacheDir, "music")
             path.mkdirs() // don't forget to make the directory
             val file = File(path, "\$fileName")
@@ -233,7 +232,7 @@ class FirstFragment : Fragment() {
             stream.write(data)
             inputStream1.close()
             stream.close()
-            cachePath = file.absolutePath
+            val cachePath = file.absolutePath
             val cachedImgFile = File(cachePath)
             val resolver = requireContext().contentResolver
             val cachedImgUrl = cachedImgFile.toURI().toURL()
@@ -287,34 +286,36 @@ class FirstFragment : Fragment() {
 
     private fun requestReadWritePermission(returnCode: Int) {
         val activity = context as Activity?
-        if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                activity!!,
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            )
+        ) {
             Snackbar.make(
                 binding.coordinatorLayout, "Allow saving with permission.",
                 Snackbar.LENGTH_INDEFINITE
-            ).setAction("OK",
-                View.OnClickListener { view: View? ->
-                    ActivityCompat.requestPermissions(
-                        activity,
-                        arrayOf<String>(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                        returnCode
-                    )
-                }).show()
+            ).setAction("OK") {
+                ActivityCompat.requestPermissions(
+                    activity,
+                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                    returnCode
+                )
+            }.show()
         } else {
             ActivityCompat.requestPermissions(
                 activity,
-                arrayOf<String>(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
                 returnCode
             )
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    suspend fun permissionCheckSaveMusic(): Boolean = withContext(Dispatchers.Default) {
+    suspend fun permissionCheckSaveMusic(): Boolean = withContext(Dispatchers.IO) {
         var inputStream: InputStream? = null
         var out: OutputStream? = null
         try {
-            var cachePath = ""
-            val path: File = File(context?.externalCacheDir, "music")
+            val path = File(context?.externalCacheDir, "music")
             path.mkdirs() // don't forget to make the directory
             val file = File(path, "\$fileName")
             val stream = FileOutputStream(file)
@@ -324,7 +325,7 @@ class FirstFragment : Fragment() {
             stream.write(data)
             `is`.close()
             stream.close()
-            cachePath = file.absolutePath
+            val cachePath = file.absolutePath
             val cachedImgFile = File(cachePath)
             val resolver: ContentResolver = context?.contentResolver!!
             val cachedImgUrl = cachedImgFile.toURI().toURL()
@@ -378,7 +379,7 @@ class FirstFragment : Fragment() {
         findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
 
-    public fun saveMusic() {
+    fun saveMusic() {
         if (ActivityCompat.checkSelfPermission(
                 requireContext(),
                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -421,7 +422,8 @@ class FirstFragment : Fragment() {
 
         val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-        common.volume = (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
+        common.volume =
+            (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
         noisyAudioStreamReceiver = NoisyAudioStreamReceiver()
         startPlayback()
         if (common.playMusic) {
@@ -573,7 +575,7 @@ class FirstFragment : Fragment() {
             common.setSlots(slots)
             common.resumePreviousPuzzle = true
             common.currPuzzleTime = currentTime
-        }else{
+        } else {
             common.resumePreviousPuzzle = false
         }
 
@@ -716,7 +718,7 @@ class FirstFragment : Fragment() {
         myMediaPlayer.cleanUp()
     }
 
-    public fun toggleUIOverlay() {
+    fun toggleUIOverlay() {
         if (common.isLogging)
             Log.d(TAG, "toggleUIOverlay CommonVariables")
 
@@ -802,7 +804,7 @@ class FirstFragment : Fragment() {
         if (common.isLogging) Log.d(TAG, "updatePhysics PuzzleSurface")
 
         if (common.isPuzzleSolved) {
-            val solveTime = "Solve time = " + binding.puzzle.puzzle.solveTime + " secs."
+            val solveTime = "Solve time = " + (binding.puzzle.puzzle?.solveTime ?: 0) + " secs."
             val coroutineScope = CoroutineScope(Dispatchers.Main)
             coroutineScope.launch {
                 binding.scoreText.text = solveTime
