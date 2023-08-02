@@ -286,11 +286,7 @@ class FirstFragment : Fragment() {
 
     private fun requestReadWritePermission(returnCode: Int) {
         val activity = context as Activity?
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                activity!!,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        ) {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(activity!!, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
             Snackbar.make(
                 binding.coordinatorLayout, "Allow saving with permission.",
                 Snackbar.LENGTH_INDEFINITE
