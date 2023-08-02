@@ -28,8 +28,6 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation.findNavController
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.compose.myapplication.databinding.FragmentFirstBinding
 import com.google.android.material.snackbar.Snackbar
@@ -91,7 +89,7 @@ class FirstFragment : Fragment() {
 
             if (AudioManager.ACTION_AUDIO_BECOMING_NOISY == intent.action) {
                 // quiet the media player
-                // myMediaPlayer.setNewVolume(0.1f)
+                myMediaPlayer.setNewVolume(0.1f)
             }
         }
     }
@@ -149,7 +147,7 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-
+        audioInit()
         binding.devartButton.setOnClickListener {
             hideButtons()
             val intent2 = Intent(Intent.ACTION_VIEW)
@@ -424,6 +422,18 @@ class FirstFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+
+        val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+        common.volume = (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
+        noisyAudioStreamReceiver = NoisyAudioStreamReceiver()
+        startPlayback()
+        if (common.playMusic) {
+            myMediaPlayer.resume()
+        } else {
+            //return sound to device
+            myMediaPlayer.abandonFocus()
+        }
     }
 
     /**
@@ -630,14 +640,29 @@ class FirstFragment : Fragment() {
         }
     }
 
+    private fun audioInit() {
+        // create new my media player
+        myMediaPlayer = MyMediaPlayer(context)
+        myMediaPlayer.init()
+        binding.puzzle.myMediaPlayer = myMediaPlayer
+        mySoundPool = MySoundPool(context, 15, AudioManager.STREAM_MUSIC, 100)
+        mySoundPool.init()
+        common.mySoundPool = mySoundPool
+    }
+
 
     override fun onPause() {
         super.onPause()
+
+        stopPlayback()
+
+        myMediaPlayer.pause()
+        binding.puzzle.onPause()
     }
 
     override fun onStop() {
         super.onStop()
-        // myMediaPlayer.onStop()
+        myMediaPlayer.onStop()
 
         val slotString = binding.puzzle.slotString
         val dateLong = common.currPuzzleTime
@@ -684,6 +709,9 @@ class FirstFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+
+        mySoundPool.release()
+        myMediaPlayer.cleanUp()
     }
 
     public fun toggleUIOverlay() {

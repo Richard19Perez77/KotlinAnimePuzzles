@@ -1,23 +1,17 @@
 package com.compose.myapplication;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.net.Uri;
 import android.text.InputType;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -288,11 +282,11 @@ public class PuzzleSurface extends SurfaceView implements
     public void toggleMusic() {
         if (common.playMusic) {
             common.playMusic = false;
-            myMediaPlayer.pause();
+            myMediaPlayer.togglePause();
             showToast("Music Off");
         } else {
             common.playMusic = true;
-            myMediaPlayer.resume();
+            myMediaPlayer.togglePause();
             showToast("Music On");
         }
     }

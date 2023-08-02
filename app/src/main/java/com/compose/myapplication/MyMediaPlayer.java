@@ -19,42 +19,47 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
         MediaPlayer.OnCompletionListener {
 
     Context context;
-
-    public MyMediaPlayer(Context context){
-        this.context = context;
-        path = Uri.parse(context.getString(R.string.PATH) + Data.TRACK_01);
-    }
-
     CommonVariables cv = CommonVariables.getInstance();
-
-    public MediaPlayer mediaPlayer;
+    public MediaPlayer mediaPlayer = new MediaPlayer();
     Uri path;
     AudioManager am;
     int result;
     public float currentVolume = 0f;
-
     /**
      * Used in testing to tell if the headphones were unplugged or not
      */
     public boolean volumeSet = false;
+    public State currentState;
+
+    public void togglePause() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            cv.currentSoundPosition = mediaPlayer.getCurrentPosition();
+            currentState = State.Paused;
+        } else {
+            mediaPlayer.seekTo(cv.currentSoundPosition);
+            mediaPlayer.start();
+            currentState = State.Started;
+        }
+    }
 
     public enum State {
         Idle, Initialized, Prepared, Started, Preparing, Stopped, Paused, End, Error, PlaybackCompleted
     }
 
-    public State currentState;
+    public MyMediaPlayer(Context context) {
+        this.context = context;
+        path = Uri.parse(context.getString(R.string.PATH) + Data.TRACK_01);
+        mediaPlayer.setOnPreparedListener(this);
+        mediaPlayer.setOnErrorListener(this);
+        mediaPlayer.setOnCompletionListener(this);
+        am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+    }
 
     /**
      * Initialize a new media player and audio manager instance. Set state to Idle.
      */
     public void init() {
-        if (mediaPlayer == null) {
-            mediaPlayer = new MediaPlayer();
-            mediaPlayer.setOnPreparedListener(this);
-            mediaPlayer.setOnErrorListener(this);
-            mediaPlayer.setOnCompletionListener(this);
-        }
-        am = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         mediaPlayer.reset();
         currentState = State.Idle;
     }
@@ -72,13 +77,14 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
                 if (currentState != State.Preparing) try {
                     mediaPlayer.setDataSource(context, path);
                     currentState = State.Initialized;
-                    mediaPlayer
-                            .setAudioStreamType(AudioManager.STREAM_MUSIC);
+                    mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                     mediaPlayer.setVolume(cv.volume, cv.volume);
                     currentVolume = cv.volume;
+                    mediaPlayer.setLooping(true);
                     mediaPlayer.prepareAsync();
                     currentState = State.Preparing;
-                } catch (IllegalArgumentException | IOException | SecurityException | IllegalStateException ignored) {
+                } catch (IllegalArgumentException | IOException | SecurityException |
+                         IllegalStateException ignored) {
                 }
             }
         }
@@ -214,11 +220,8 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
      * Release memory associated with the media player.
      */
     public void cleanUp() {
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            currentState = State.End;
-            mediaPlayer = null;
-        }
+        mediaPlayer.release();
+        currentState = State.End;
     }
 
     /**
@@ -237,12 +240,10 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
      * If playing, stop the media player, record position of sound and set state to Paused.
      */
     public void onStop() {
-        if (mediaPlayer != null) {
-            if (mediaPlayer.isPlaying()) {
-                mediaPlayer.pause();
-                currentState = State.Paused;
-                cv.currentSoundPosition = mediaPlayer.getCurrentPosition();
-            }
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.pause();
+            currentState = State.Paused;
+            cv.currentSoundPosition = mediaPlayer.getCurrentPosition();
         }
     }
 }
