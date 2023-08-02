@@ -64,7 +64,6 @@ public class CommonVariables {
     public Date stopPuzzle = new Date();
     public long currPuzzleTime = 0;
     public long fourRecordSolveTime = 0;
-    public boolean createNewPuzzle;
     public long nineRecordSolveTime = 0;
     public long sixteenRecordSolveTime = 0;
     public long twentyfiveRecordSolveTime = 0;

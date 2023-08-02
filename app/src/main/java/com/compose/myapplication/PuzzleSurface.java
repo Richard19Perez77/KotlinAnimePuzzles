@@ -104,10 +104,8 @@ public class PuzzleSurface extends SurfaceView implements
 
         puzzleUpdateAndDraw.surfaceChanged(width, height);
         if (common.resumePreviousPuzzle) {
-            common.resumePreviousPuzzle = false;
             resumePuzzle();
-        } else  {
-            common.createNewPuzzle = false;
+        } else {
             createPuzzle();
         }
     }
@@ -283,13 +281,12 @@ public class PuzzleSurface extends SurfaceView implements
     public void toggleMusic() {
         if (common.playMusic) {
             common.playMusic = false;
-            myMediaPlayer.togglePause();
             showToast("Music Off");
         } else {
             common.playMusic = true;
-            myMediaPlayer.togglePause();
             showToast("Music On");
         }
+        myMediaPlayer.togglePause();
     }
 
     /**

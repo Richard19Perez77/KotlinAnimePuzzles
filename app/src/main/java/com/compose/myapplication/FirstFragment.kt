@@ -573,8 +573,8 @@ class FirstFragment : Fragment() {
             common.setSlots(slots)
             common.resumePreviousPuzzle = true
             common.currPuzzleTime = currentTime
-        } else {
-            common.createNewPuzzle = true
+        }else{
+            common.resumePreviousPuzzle = false
         }
 
         //start of saved stats
@@ -654,11 +654,10 @@ class FirstFragment : Fragment() {
 
     override fun onPause() {
         super.onPause()
-        saveSharedPrefs()
         stopPlayback()
-
         myMediaPlayer.pause()
         binding.puzzle.onPause()
+        saveSharedPrefs()
     }
 
     private fun saveSharedPrefs() {

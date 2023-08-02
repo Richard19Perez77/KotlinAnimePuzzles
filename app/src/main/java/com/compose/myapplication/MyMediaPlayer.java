@@ -20,7 +20,7 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
 
     Context context;
     CommonVariables cv = CommonVariables.getInstance();
-    public MediaPlayer mediaPlayer = new MediaPlayer();
+    public MediaPlayer mediaPlayer;
     Uri path;
     AudioManager am;
     int result;
@@ -37,9 +37,8 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
             cv.currentSoundPosition = mediaPlayer.getCurrentPosition();
             currentState = State.Paused;
         } else {
-            mediaPlayer.seekTo(cv.currentSoundPosition);
-            mediaPlayer.start();
-            currentState = State.Started;
+            init();
+            start();
         }
     }
 
@@ -50,6 +49,7 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
     public MyMediaPlayer(Context context) {
         this.context = context;
         path = Uri.parse(context.getString(R.string.PATH) + Data.TRACK_01);
+        mediaPlayer = new MediaPlayer();
         mediaPlayer.setOnPreparedListener(this);
         mediaPlayer.setOnErrorListener(this);
         mediaPlayer.setOnCompletionListener(this);
@@ -60,6 +60,12 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
      * Initialize a new media player and audio manager instance. Set state to Idle.
      */
     public void init() {
+        if (mediaPlayer == null){
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setOnPreparedListener(this);
+            mediaPlayer.setOnErrorListener(this);
+            mediaPlayer.setOnCompletionListener(this);
+        }
         mediaPlayer.reset();
         currentState = State.Idle;
     }
@@ -192,14 +198,15 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
                 currentState = State.Paused;
+                cv.currentSoundPosition = mediaPlayer.getCurrentPosition();
             }
             if (currentState == State.Started || currentState == State.Paused) {
                 mediaPlayer.stop();
                 currentState = State.Stopped;
+                mediaPlayer.release();
+                currentState = State.End;
+                mediaPlayer = null;
             }
-            mediaPlayer.release();
-            currentState = State.End;
-            mediaPlayer = null;
         }
     }
 
@@ -222,6 +229,7 @@ public class MyMediaPlayer implements MediaPlayer.OnPreparedListener,
     public void cleanUp() {
         mediaPlayer.release();
         currentState = State.End;
+        mediaPlayer = null;
     }
 
     /**
