@@ -27,6 +27,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.compose.myapplication.databinding.FragmentFirstBinding
@@ -185,21 +186,30 @@ class FirstFragment : Fragment() {
         }
 
         binding.saveImageButton.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val coroutineScope = CoroutineScope(Dispatchers.Main)
                 coroutineScope.launch {
-                    val result = withContext(Dispatchers.IO) {
-                        permissionCheckSaveImage()
-                    }
+                    val result = saveImageQ()
                     if (result) showToast("Success!") else showToast("Error!")
                 }
             } else {
-                saveImage()
+                // permission check needed
+                requestWritePermission {
+                    val coroutineScope = CoroutineScope(Dispatchers.Main)
+                    coroutineScope.launch {
+                        val result =
+                            SavePhoto(context, CommonVariables.currentPuzzleImagePosition).run {
+                                run()
+                            }
+                        if (result) showToast("Success!") else showToast("Error!")
+
+                    }
+                }
             }
         }
 
         binding.saveMusicButton.setOnClickListener {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 val coroutineScope = CoroutineScope(Dispatchers.Main)
                 coroutineScope.launch {
                     val result = withContext(Dispatchers.IO) {
@@ -208,17 +218,44 @@ class FirstFragment : Fragment() {
                     if (result) showToast("Success!") else showToast("Error!")
                 }
             } else {
-                saveMusic()
+                requestWritePermission {
+                    val intent = Intent(requireContext(), SaveMusicService::class.java)
+                    requireContext().startService(intent)
+                }
             }
         }
 
         binding.puzzle.fragment = this
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    suspend fun permissionCheckSaveImage(): Boolean = withContext(Dispatchers.IO) {
-        var inputStream: InputStream? = null
-        var out: OutputStream? = null
+    private fun requestWritePermission(onPermissionGranted: () -> Unit) {
+        if (checkSelfPermission(
+                requireContext(),
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            (reqLauncher.contract as RequestPermissionResultContract).onPermissionGranted =
+                onPermissionGranted
+            reqLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        } else {
+            onPermissionGranted()
+        }
+    }
+
+    // ref = https://stackoverflow.com/a/66552678
+    private val reqLauncher =
+        registerForActivityResult(RequestPermissionResultContract()) { result ->
+            if (result) {
+                Log.d("RDTest", "onActivityResult: PERMISSION GRANTED")
+                //since we want dynamic callback, we set callback before reqLauncher.launch. And just print log here.
+            } else {
+                Toast.makeText(requireContext(), "Permission denied!", Toast.LENGTH_SHORT)
+                    .show()
+            }
+        }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    suspend fun saveImageQ(): Boolean = withContext(Dispatchers.IO) {
         try {
             val path = File(requireContext().externalCacheDir, "music")
             path.mkdirs() // don't forget to make the directory
@@ -245,9 +282,9 @@ class FirstFragment : Fragment() {
             )
             val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
             if (uri != null) {
-                inputStream = cachedImgUrl.openStream()
-                out = resolver.openOutputStream(uri)
-                inputStream.transferTo(out)
+                val inputStream = cachedImgUrl.openStream()
+                val out = resolver.openOutputStream(uri)
+                out?.let { inputStream.copyTo(it) }
                 inputStream.close()
                 assert(out != null)
                 out!!.close()
@@ -257,31 +294,10 @@ class FirstFragment : Fragment() {
             return@withContext true
         } catch (e: java.lang.Exception) {
             e.printStackTrace()
-        } finally {
-            try {
-                inputStream?.close()
-            } catch (e: IOException) { /* handle */
-            }
-            try {
-                out?.close()
-            } catch (e: IOException) { /*handle */
-            }
-
         }
         return@withContext false
     }
 
-    fun saveImage() {
-        if (ActivityCompat.checkSelfPermission(
-                requireContext(),
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestReadWritePermission(MainActivity.WRITE_EXTERNAL_STORAGE_IMAGE)
-        } else {
-            SavePhoto(context, CommonVariables.currentPuzzleImagePosition)
-        }
-    }
 
     private fun requestReadWritePermission(returnCode: Int) {
         val activity = context as Activity?
@@ -309,10 +325,10 @@ class FirstFragment : Fragment() {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun permissionCheckSaveMusic(): Boolean = withContext(Dispatchers.IO) {
         var inputStream: InputStream? = null
-        var out: OutputStream? = null
+        lateinit var out: OutputStream
         try {
             val path = File(context?.externalCacheDir, "music")
             path.mkdirs() // don't forget to make the directory
@@ -343,8 +359,8 @@ class FirstFragment : Fragment() {
                 )
             if (uri != null) {
                 inputStream = cachedImgUrl.openStream()
-                out = resolver.openOutputStream(uri)
-                inputStream.transferTo(out)
+                out = resolver.openOutputStream(uri)!!
+                inputStream.copyTo(out)
                 inputStream.close()
                 assert(out != null)
                 out!!.close()
@@ -378,15 +394,6 @@ class FirstFragment : Fragment() {
         findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
     }
 
-    fun saveMusic() {
-        if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestReadWritePermission(MainActivity.WRITE_EXTERNAL_STORAGE_MUSIC)
-        } else {
-            val intent = Intent(context, SaveMusicService::class.java)
-            context?.startService(intent)
-        }
-    }
-
     fun hideButtons() {
         if (binding.scoreText.visibility == View.VISIBLE) {
             binding.scoreText.visibility = View.INVISIBLE
@@ -417,7 +424,9 @@ class FirstFragment : Fragment() {
 
         val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-        CommonVariables.volume = (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
+        CommonVariables.volume =
+            (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
+                .toFloat())
         noisyAudioStreamReceiver = NoisyAudioStreamReceiver()
         startPlayback()
         if (CommonVariables.playMusic) {
@@ -477,7 +486,7 @@ class FirstFragment : Fragment() {
         }
 
         // only continue if there is an image from the previous puzzle
-        var slots: String = ""
+        var slots = ""
         if (isValid) {
             if (sharedpreferences.contains(getString(R.string.SLOTS))) {
                 slots = sharedpreferences.getString(getString(R.string.SLOTS), "").toString()
@@ -575,7 +584,8 @@ class FirstFragment : Fragment() {
 
         //start of saved stats
         if (sharedpreferences.contains(getString(R.string.PUZZLES_SOLVED))) {
-            CommonVariables.puzzlesSolved = sharedpreferences.getInt(getString(R.string.PUZZLES_SOLVED), 0)
+            CommonVariables.puzzlesSolved =
+                sharedpreferences.getInt(getString(R.string.PUZZLES_SOLVED), 0)
         }
         if (sharedpreferences.contains(getString(R.string.TWO_SOLVE_COUNT))) {
             CommonVariables.fourPiecePuzzleSolvedCount =
@@ -626,14 +636,16 @@ class FirstFragment : Fragment() {
                 sharedpreferences.getLong(getString(R.string.SEVEN_SOLVE_TIME), 0)
         }
         if (sharedpreferences.contains(getString(R.string.IMAGES_SAVED))) {
-            CommonVariables.imagesSaved = sharedpreferences.getInt(getString(R.string.IMAGES_SAVED), 0)
+            CommonVariables.imagesSaved =
+                sharedpreferences.getInt(getString(R.string.IMAGES_SAVED), 0)
         }
         if (sharedpreferences.contains(getString(R.string.BLOG_LINKS_TRAVERSED))) {
             CommonVariables.blogLinksTraversed =
                 sharedpreferences.getInt(getString(R.string.BLOG_LINKS_TRAVERSED), 0)
         }
         if (sharedpreferences.contains(getString(R.string.MUSIC_SAVED))) {
-            CommonVariables.musicSaved = sharedpreferences.getInt(getString(R.string.MUSIC_SAVED), 0)
+            CommonVariables.musicSaved =
+                sharedpreferences.getInt(getString(R.string.MUSIC_SAVED), 0)
         }
     }
 
@@ -661,7 +673,10 @@ class FirstFragment : Fragment() {
         val dateLong = CommonVariables.currPuzzleTime
 
         val editor = sharedpreferences.edit()
-        editor.putInt(getString(R.string.IMAGENUMBER), CommonVariables.currentPuzzleImagePosition)
+        editor.putInt(
+            getString(R.string.IMAGENUMBER),
+            CommonVariables.currentPuzzleImagePosition
+        )
         editor.putString(getString(R.string.SLOTS), slotString)
         editor.putBoolean(getString(R.string.SOUND), CommonVariables.playTapSound)
         editor.putBoolean(getString(R.string.MUSIC), CommonVariables.playMusic)
@@ -672,22 +687,55 @@ class FirstFragment : Fragment() {
         editor.putLong(getString(R.string.TIME), dateLong)
         editor.putInt(getString(R.string.PUZZLES_SOLVED), CommonVariables.puzzlesSolved)
         editor.putInt(getString(R.string.IMAGES_SAVED), CommonVariables.imagesSaved)
-        editor.putInt(getString(R.string.BLOG_LINKS_TRAVERSED), CommonVariables.blogLinksTraversed)
-        editor.putInt(getString(R.string.TWO_SOLVE_COUNT), CommonVariables.fourPiecePuzzleSolvedCount)
+        editor.putInt(
+            getString(R.string.BLOG_LINKS_TRAVERSED),
+            CommonVariables.blogLinksTraversed
+        )
+        editor.putInt(
+            getString(R.string.TWO_SOLVE_COUNT),
+            CommonVariables.fourPiecePuzzleSolvedCount
+        )
         editor.putLong(getString(R.string.TWO_SOLVE_TIME), CommonVariables.fourRecordSolveTime)
-        editor.putInt(getString(R.string.THREE_SOLVE_COUNT), CommonVariables.ninePiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.THREE_SOLVE_TIME), CommonVariables.nineRecordSolveTime)
-        editor.putInt(getString(R.string.FOUR_SOLVE_COUNT), CommonVariables.sixteenPiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.FOUR_SOLVE_TIME), CommonVariables.sixteenRecordSolveTime)
-        editor.putInt(getString(R.string.FIVE_SOLVE_COUNT), CommonVariables.twentyfivePiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.FIVE_SOLVE_TIME), CommonVariables.twentyfiveRecordSolveTime)
-        editor.putInt(getString(R.string.SIX_SOLVE_COUNT), CommonVariables.thirtysixPiecePuzzleSolvedCount)
-        editor.putLong(getString(R.string.SIX_SOLVE_TIME), CommonVariables.thirtysixRecordsSolveTime)
+        editor.putInt(
+            getString(R.string.THREE_SOLVE_COUNT),
+            CommonVariables.ninePiecePuzzleSolvedCount
+        )
+        editor.putLong(
+            getString(R.string.THREE_SOLVE_TIME),
+            CommonVariables.nineRecordSolveTime
+        )
+        editor.putInt(
+            getString(R.string.FOUR_SOLVE_COUNT),
+            CommonVariables.sixteenPiecePuzzleSolvedCount
+        )
+        editor.putLong(
+            getString(R.string.FOUR_SOLVE_TIME),
+            CommonVariables.sixteenRecordSolveTime
+        )
+        editor.putInt(
+            getString(R.string.FIVE_SOLVE_COUNT),
+            CommonVariables.twentyfivePiecePuzzleSolvedCount
+        )
+        editor.putLong(
+            getString(R.string.FIVE_SOLVE_TIME),
+            CommonVariables.twentyfiveRecordSolveTime
+        )
+        editor.putInt(
+            getString(R.string.SIX_SOLVE_COUNT),
+            CommonVariables.thirtysixPiecePuzzleSolvedCount
+        )
+        editor.putLong(
+            getString(R.string.SIX_SOLVE_TIME),
+            CommonVariables.thirtysixRecordsSolveTime
+        )
         editor.putInt(
             getString(R.string.SEVEN_SOLVE_COUNT),
             CommonVariables.fourtyninePiecePuzzleSolvedCount
         )
-        editor.putLong(getString(R.string.SEVEN_SOLVE_TIME), CommonVariables.fourtynineRecordsSolveTime)
+        editor.putLong(
+            getString(R.string.SEVEN_SOLVE_TIME),
+            CommonVariables.fourtynineRecordsSolveTime
+        )
         editor.apply()
     }
 

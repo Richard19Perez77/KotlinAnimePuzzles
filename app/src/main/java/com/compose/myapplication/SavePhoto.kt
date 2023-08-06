@@ -4,10 +4,8 @@ import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Environment
-import android.widget.Toast
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -21,17 +19,13 @@ import java.io.OutputStream
  */
 class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
 
-    private fun showToast(message: String?) {
-        // Create and show toast for save photo
-        val toast = Toast.makeText(c, message, Toast.LENGTH_SHORT)
-        toast.show()
-    }
+    suspend fun run(): Boolean = withContext(Dispatchers.IO) {
+        var success: Boolean
 
-    init {
-        val customScope = CoroutineScope(Dispatchers.Default)
-        customScope.launch {
-            var mExternalStorageAvailable = false
-            var mExternalStorageWriteable = false
+        try {
+
+            val mExternalStorageAvailable: Boolean
+            val mExternalStorageWriteable: Boolean
 
             // save current image to devices images folder
             val state = Environment.getExternalStorageState()
@@ -39,7 +33,7 @@ class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
             if (Environment.MEDIA_MOUNTED == state) {
                 // We can read and write the media
                 mExternalStorageWriteable = true
-                mExternalStorageAvailable = mExternalStorageWriteable
+                mExternalStorageAvailable = true
             } else if (Environment.MEDIA_MOUNTED_READ_ONLY == state) {
                 // We can only read the media
                 mExternalStorageAvailable = true
@@ -50,7 +44,7 @@ class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
                 // all we need
                 // to know is we can neither read nor write
                 mExternalStorageWriteable = false
-                mExternalStorageAvailable = mExternalStorageWriteable
+                mExternalStorageAvailable = false
             }
             if (mExternalStorageAvailable && mExternalStorageWriteable) {
                 // then write picture to phone
@@ -63,7 +57,7 @@ class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
 
                 // check for file in directory
                 if (file.exists()) {
-                    showToast("Photo Exists Already!")
+                    success = false
                 } else {
                     try {
                         val b1 = path.mkdirs()
@@ -77,33 +71,34 @@ class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
                             )
                             val os: OutputStream = FileOutputStream(file)
                             val data = `is`?.let { ByteArray(it.available()) }
-                            if (`is` != null) {
-                                `is`.read(data)
-                            }
+                            `is`?.read(data)
                             os.write(data)
-                            if (`is` != null) {
-                                `is`.close()
+                            `is`?.close()
+                            withContext(Dispatchers.IO) {
+                                os.close()
                             }
-                            os.close()
                             CommonVariables.imagesSaved++
                             val act = c as MainActivity
                             act.updatePuzzleStats()
-                            showToast("Image Saved!")
                             MediaScannerConnection
                                 .scanFile(
                                     c, arrayOf(file.toString()),
                                     null
-                                ) { path1: String?, uri: Uri? -> }
+                                ) { _: String?, _: Uri? -> }
+                            success = true
                         } else {
-                            showToast("Could not make/access directory.")
+                            success = false
                         }
                     } catch (e: IOException) {
-                        showToast("Error making/accessing directory.")
+                        success = false
                     }
                 }
             } else {
-                showToast("Directory not available/writable.")
+                success = false
             }
+        } catch (_: Exception) {
+            success = false
         }
+        return@withContext success
     }
 }
