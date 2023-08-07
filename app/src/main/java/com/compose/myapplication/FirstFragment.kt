@@ -357,9 +357,10 @@ class FirstFragment : Fragment() {
             cachedImgFile.delete()
             CommonVariables.musicSaved++
             return@withContext true
-        } catch (e: java.lang.Exception) {
-            e.printStackTrace()
+        } catch (_: IOException){
+
         }
+
         return@withContext false
     }
 
