@@ -19,8 +19,8 @@ import java.io.OutputStream
  */
 class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
 
-    suspend fun run(): Boolean = withContext(Dispatchers.IO) {
-        var success: Boolean
+    suspend fun run(): FirstFragment.Companion.PHOTO_RESULT = withContext(Dispatchers.IO) {
+        var success: FirstFragment.Companion.PHOTO_RESULT
 
         try {
 
@@ -57,7 +57,7 @@ class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
 
                 // check for file in directory
                 if (file.exists()) {
-                    success = false
+                    success = FirstFragment.Companion.PHOTO_RESULT.EXISTS
                 } else {
                     try {
                         val b1 = path.mkdirs()
@@ -85,19 +85,19 @@ class SavePhoto(private var c: Context?, private var currentImageToSave: Int) {
                                     c, arrayOf(file.toString()),
                                     null
                                 ) { _: String?, _: Uri? -> }
-                            success = true
+                            success = FirstFragment.Companion.PHOTO_RESULT.SAVED
                         } else {
-                            success = false
+                            success = FirstFragment.Companion.PHOTO_RESULT.ERROR
                         }
                     } catch (e: IOException) {
-                        success = false
+                        success = FirstFragment.Companion.PHOTO_RESULT.ERROR
                     }
                 }
             } else {
-                success = false
+                success = FirstFragment.Companion.PHOTO_RESULT.ERROR
             }
         } catch (_: Exception) {
-            success = false
+            success = FirstFragment.Companion.PHOTO_RESULT.ERROR
         }
         return@withContext success
     }

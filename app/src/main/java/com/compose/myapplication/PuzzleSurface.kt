@@ -50,7 +50,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
             CommonVariables.isWindowInFocus = false
         } else {
             CommonVariables.isWindowInFocus = true
-            puzzleUpdateAndDraw!!.updateAndDraw()
+            puzzleUpdateAndDraw?.updateAndDraw()
         }
     }
 

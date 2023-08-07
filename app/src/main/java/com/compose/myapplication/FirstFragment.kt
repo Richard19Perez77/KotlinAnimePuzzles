@@ -53,6 +53,12 @@ class FirstFragment : Fragment() {
     companion object {
         const val PUZZLE_LOG = "puzzleLog"
         const val TAG = "com.compose.myapplication.FirstFragment"
+
+        enum class PHOTO_RESULT {
+            SAVED,
+            ERROR,
+            EXISTS
+        }
     }
 
     lateinit var myMediaPlayer: MyMediaPlayer
@@ -149,7 +155,6 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        getSharedPrefs()
         audioInit()
         binding.devartButton.setOnClickListener {
             hideButtons()
@@ -271,11 +276,21 @@ class FirstFragment : Fragment() {
                             SavePhoto(context, CommonVariables.currentPuzzleImagePosition).run {
                                 run()
                             }
-                        if (result) showToast("Success!") else showToast("Error!")
+                        when (result) {
+                            PHOTO_RESULT.SAVED ->
+                                showToast("Success!")
+
+                            PHOTO_RESULT.ERROR ->
+                                showToast("Error!")
+
+                            PHOTO_RESULT.EXISTS ->
+                                showToast("Exists!")
+
+                            else -> {}
+                        }
                     }
                 }
             })
-
 
     private fun requestWritePermission(onPermissionGranted: () -> Unit) {
         if (checkSelfPermission(
@@ -470,7 +485,7 @@ class FirstFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-
+        getSharedPrefs()
         val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
         CommonVariables.volume =

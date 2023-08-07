@@ -49,7 +49,7 @@ class SaveMusicService : IntentService("SaveMusicService") {
         if (Environment.MEDIA_MOUNTED == state) {
             // We can read and write the media
             mExternalStorageWriteable = true
-            mExternalStorageAvailable = mExternalStorageWriteable
+            mExternalStorageAvailable = true
         } else if (Environment.MEDIA_MOUNTED_READ_ONLY == state) {
             // We can only read the media
             mExternalStorageAvailable = true
@@ -60,7 +60,7 @@ class SaveMusicService : IntentService("SaveMusicService") {
             // all we need
             // to know is we can neither read nor write
             mExternalStorageWriteable = false
-            mExternalStorageAvailable = mExternalStorageWriteable
+            mExternalStorageAvailable = false
         }
         if (mExternalStorageAvailable && mExternalStorageWriteable) {
 
@@ -95,7 +95,7 @@ class SaveMusicService : IntentService("SaveMusicService") {
                             .scanFile(
                                 applicationContext, arrayOf(file.toString()),
                                 null
-                            ) { _, uri -> }
+                            ) { _, _ -> }
                     } else {
                         serviceToast("Could not make/access directory.")
                     }
