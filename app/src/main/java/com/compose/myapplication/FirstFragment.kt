@@ -347,11 +347,12 @@ class FirstFragment : Fragment() {
             val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
             if (uri != null) {
                 val inputStream = cachedImgUrl.openStream()
-                val out = resolver.openOutputStream(uri)
-                out?.let { inputStream.copyTo(it) }
-                inputStream.close()
-                assert(out != null)
-                out!!.close()
+                inputStream.use {
+                    val out = resolver.openOutputStream(uri)
+                    out.use {
+                        out?.let { inputStream.copyTo(it) }
+                    }
+                }
             }
             cachedImgFile.delete()
             CommonVariables.musicSaved++
