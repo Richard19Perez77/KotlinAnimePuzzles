@@ -202,7 +202,7 @@ class FirstFragment : Fragment() {
             } else {
                 val PERMISSION_WRITE_EXTERNAL_STORAGE =
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                requestPermissionLauncherPhoto.launch(PERMISSION_WRITE_EXTERNAL_STORAGE);
+                requestPermissionLauncherPhoto.launch(PERMISSION_WRITE_EXTERNAL_STORAGE)
 
 
 //                // permission check needed
