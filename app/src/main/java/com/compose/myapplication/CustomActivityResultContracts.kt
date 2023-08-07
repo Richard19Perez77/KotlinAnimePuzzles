@@ -8,9 +8,6 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.collection.ArrayMap
 import androidx.core.content.ContextCompat
 
-/**
- * An [ActivityResultContract] to [request a permission][Activity.requestPermissions]
- */
 class RequestPermissionResultContract(var onPermissionGranted: () -> Unit = {}) :
     ActivityResultContract<String, Boolean>() {
 

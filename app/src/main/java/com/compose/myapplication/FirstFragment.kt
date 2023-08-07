@@ -25,6 +25,8 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.Toast
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
@@ -193,18 +195,23 @@ class FirstFragment : Fragment() {
                     if (result) showToast("Success!") else showToast("Error!")
                 }
             } else {
-                // permission check needed
-                requestWritePermission {
-                    val coroutineScope = CoroutineScope(Dispatchers.Main)
-                    coroutineScope.launch {
-                        val result =
-                            SavePhoto(context, CommonVariables.currentPuzzleImagePosition).run {
-                                run()
-                            }
-                        if (result) showToast("Success!") else showToast("Error!")
+                val PERMISSION_WRITE_EXTERNAL_STORAGE =
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                requestPermissionLauncherPhoto.launch(PERMISSION_WRITE_EXTERNAL_STORAGE);
 
-                    }
-                }
+
+//                // permission check needed
+//                requestWritePermission {
+//                    val coroutineScope = CoroutineScope(Dispatchers.Main)
+//                    coroutineScope.launch {
+//                        val result =
+//                            SavePhoto(context, CommonVariables.currentPuzzleImagePosition).run {
+//                                run()
+//                            }
+//                        if (result) showToast("Success!") else showToast("Error!")
+//
+//                    }
+//                }
             }
         }
 
@@ -227,6 +234,48 @@ class FirstFragment : Fragment() {
 
         binding.puzzle.fragment = this
     }
+
+    class PermissionResultContract : ActivityResultContract<String, Boolean>() {
+        override fun createIntent(context: Context, input: String): Intent {
+            return Intent("androidx.activity.result.contract.action.REQUEST_PERMISSIONS").putExtra(
+                "androidx.activity.result.contract.extra.PERMISSIONS",
+                arrayOf(input)
+            )
+        }
+
+        override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
+            if (intent == null || resultCode != Activity.RESULT_OK) return false
+            val grantResults =
+                intent.getIntArrayExtra(RequestMultiplePermissions.EXTRA_PERMISSION_GRANT_RESULTS)
+            if (grantResults == null || grantResults.isEmpty()) return false
+            return grantResults[0] == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private var requestPermissionLauncherMusic =
+        registerForActivityResult(PermissionResultContract(),
+            ActivityResultCallback() {
+                if (it) {
+                    val intent = Intent(requireContext(), SaveMusicService::class.java)
+                    requireContext().startService(intent)
+                }
+            })
+
+    private var requestPermissionLauncherPhoto =
+        registerForActivityResult(PermissionResultContract(),
+            ActivityResultCallback() {
+                if (it) {
+                    val coroutineScope = CoroutineScope(Dispatchers.Main)
+                    coroutineScope.launch {
+                        val result =
+                            SavePhoto(context, CommonVariables.currentPuzzleImagePosition).run {
+                                run()
+                            }
+                        if (result) showToast("Success!") else showToast("Error!")
+                    }
+                }
+            })
+
 
     private fun requestWritePermission(onPermissionGranted: () -> Unit) {
         if (checkSelfPermission(
