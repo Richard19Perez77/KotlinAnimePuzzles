@@ -28,12 +28,10 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.RequiresApi
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.compose.myapplication.databinding.FragmentFirstBinding
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -238,6 +236,7 @@ class FirstFragment : Fragment() {
         }
 
         binding.puzzle.fragment = this
+        binding.puzzle.soundPool = mySoundPool
     }
 
     class PermissionResultContract : ActivityResultContract<String, Boolean>() {
@@ -364,33 +363,6 @@ class FirstFragment : Fragment() {
         return@withContext false
     }
 
-
-    private fun requestReadWritePermission(returnCode: Int) {
-        val activity = context as Activity?
-        if (ActivityCompat.shouldShowRequestPermissionRationale(
-                activity!!,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-        ) {
-            Snackbar.make(
-                binding.coordinatorLayout, "Allow saving with permission.",
-                Snackbar.LENGTH_INDEFINITE
-            ).setAction("OK") {
-                ActivityCompat.requestPermissions(
-                    activity,
-                    arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    returnCode
-                )
-            }.show()
-        } else {
-            ActivityCompat.requestPermissions(
-                activity,
-                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                returnCode
-            )
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun permissionCheckSaveMusic(): Boolean = withContext(Dispatchers.IO) {
         var inputStream: InputStream? = null
@@ -488,8 +460,8 @@ class FirstFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         getSharedPrefs()
-        val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-        val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
+        // val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
+        // val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
         // CommonVariables.volume = (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
         noisyAudioStreamReceiver = NoisyAudioStreamReceiver()
         startPlayback()
@@ -718,9 +690,9 @@ class FirstFragment : Fragment() {
         myMediaPlayer = MyMediaPlayer(context)
         myMediaPlayer.init()
         binding.puzzle.myMediaPlayer = myMediaPlayer
-        mySoundPool = MySoundPool(context, 15, AudioManager.STREAM_MUSIC, 100)
+        mySoundPool = MySoundPool(15, AudioManager.STREAM_MUSIC, 100)
         mySoundPool.init()
-        CommonVariables.mySoundPool = mySoundPool
+        mySoundPool.load(context)
     }
 
 

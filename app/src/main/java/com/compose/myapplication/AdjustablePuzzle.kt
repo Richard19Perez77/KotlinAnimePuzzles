@@ -23,6 +23,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private var yparts = 0
     private var TAG = "com.compose.myapplication.AdjustablePuzzle"
 
+
     fun getPreviousImageLoadedScaledDivided() {
         if (CommonVariables.isLogging) Log.d(
             TAG,
@@ -51,7 +52,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                 CommonVariables.isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
                 if (CommonVariables.isPuzzleSplitCorrectly) {
                     CommonVariables.isImageError = false
-                    CommonVariables.mySoundPool?.playChimeSound()
+                    puzzleSurface.soundPool?.playChimeSound()
                     CommonVariables.isImageLoaded = true
                     checkToBeSolved()
                     updateAndDraw()
@@ -111,7 +112,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                 if (CommonVariables.isPuzzleSplitCorrectly) {
                     resetTimer()
                     CommonVariables.isImageError = false
-                    CommonVariables.mySoundPool?.playChimeSound()
+                    puzzleSurface.soundPool?.playChimeSound()
                     CommonVariables.isImageLoaded = true
                     checkToBeSolved()
                     updateAndDraw()
@@ -350,7 +351,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                     CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sx!!
                 CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py =
                     CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy!!
-                CommonVariables.playSetSound()
+                puzzleSurface.soundPool?.playSetSound()
                 updateAndDraw()
                 return false
             } else {
@@ -384,7 +385,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                     CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.puzzlePiece?.py =
                         CommonVariables.puzzleSlots[CommonVariables.currSlotOnTouchDown]?.sy!!
                 }
-                CommonVariables.playSetSound()
+                puzzleSurface.soundPool?.playSetSound()
 
                 // check for all images to by in place
                 CommonVariables.inPlace = 0

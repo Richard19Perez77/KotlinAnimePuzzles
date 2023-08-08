@@ -9,7 +9,6 @@ import android.media.SoundPool
  * @author Rick
  */
 class MySoundPool @Suppress("deprecation") constructor(
-    var context: Context?,
     maxStreams: Int,
     streamType: Int,
     srcQuality: Int
@@ -39,8 +38,14 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     fun init() {
         setOnLoadCompleteListener(this)
-        CommonVariables.saveSound = load(context, R.raw.imagesaved, 1)
-        CommonVariables.tapSound = load(context, R.raw.tap, 1)
+    }
+
+    /***
+     *  Load the sounds to the sound pool
+     */
+    fun load(c: Context?) {
+        CommonVariables.saveSound = load(c, R.raw.imagesaved, 1)
+        CommonVariables.tapSound = load(c, R.raw.tap, 1)
     }
 
     /**

@@ -25,6 +25,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
     c, attrs
 ), SurfaceHolder.Callback {
 
+    var soundPool: MySoundPool? = null
     var borderPaintA: Paint
     var borderPaintB: Paint
     var transPaint: Paint
