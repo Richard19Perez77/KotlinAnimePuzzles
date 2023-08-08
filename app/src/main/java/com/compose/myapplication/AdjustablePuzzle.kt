@@ -19,14 +19,16 @@ import java.util.Random
  */
 class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
 
-    // a result of the sides h x w
+    private lateinit var ys: IntArray
+    private lateinit var xs: IntArray
+    private lateinit var image: Bitmap
+    private var imagesShown = ArrayList<Int>()
+
+    private var rand = Random()
     private var pieces = 0
     private var xparts = 0
     private var yparts = 0
-    private var rand = Random()
 
-    private lateinit var image: Bitmap
-    private var imagesShown = ArrayList<Int>()
     private var TAG = ".AdjustablePuzzle"
 
     fun getPreviousImageLoadedScaledDivided() {
@@ -156,19 +158,19 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         val h: Int = image.height
         val pieceW = w / xparts
         val pieceH = h / yparts
-        CommonVariables.xs = IntArray(xparts)
+        xs = IntArray(xparts)
         for (i in 0 until xparts) {
-            CommonVariables.xs[i] = pieceW * i
+            xs[i] = pieceW * i
         }
-        CommonVariables.ys = IntArray(yparts)
+        ys = IntArray(yparts)
         for (i in 0 until yparts) {
-            CommonVariables.ys[i] = pieceH * i
+            ys[i] = pieceH * i
         }
         var acc = 0
-        for (i in CommonVariables.ys.indices) {
-            val tempy = CommonVariables.ys[i]
-            for (j in CommonVariables.xs.indices) {
-                val tempx = CommonVariables.xs[j]
+        for (i in ys.indices) {
+            val tempy = ys[i]
+            for (j in xs.indices) {
+                val tempx = xs[j]
                 setBorderPoint(acc, tempx, tempy)
                 setBitmapToPiece(acc, tempx, tempy, pieceW, pieceH)
                 setPointsToSlotAndPiece(acc, tempx, tempy, pieceW, pieceH)
@@ -291,16 +293,16 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
 
             // get x index
             var xIndex = 0
-            for (i in CommonVariables.xs.indices) {
-                if (downX >= CommonVariables.xs[i]) {
+            for (i in xs.indices) {
+                if (downX >= xs[i]) {
                     xIndex = i
                 }
             }
 
             // get y index
             var yIndex = 0
-            for (i in CommonVariables.ys.indices) {
-                if (downY >= CommonVariables.ys[i]) {
+            for (i in ys.indices) {
+                if (downY >= ys[i]) {
                     yIndex = i
                 }
             }
@@ -356,16 +358,16 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
             } else {
                 // get x index
                 var xIndex = 0
-                for (i in CommonVariables.xs.indices) {
-                    if (upX >= CommonVariables.xs[i]) {
+                for (i in xs.indices) {
+                    if (upX >= xs[i]) {
                         xIndex = i
                     }
                 }
 
                 // get y index
                 var yIndex = 0
-                for (i in CommonVariables.ys.indices) {
-                    if (upY >= CommonVariables.ys[i]) {
+                for (i in ys.indices) {
+                    if (upY >= ys[i]) {
                         yIndex = i
                     }
                 }

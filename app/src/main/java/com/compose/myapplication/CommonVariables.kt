@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
 import java.util.Date
-import java.util.Random
 
 /**
  * A class to hold variables that will be used across classes and the more
@@ -52,8 +51,6 @@ object CommonVariables {
     lateinit var puzzleSlots: Array<PuzzleSlot?>
     var dimensions = 0.0
     lateinit var points: Array<Point?>
-    lateinit var ys: IntArray
-    lateinit var xs: IntArray
     var puzzlesSolved = 0
     var isLogging = false
     var isImageLoaded = false
