@@ -14,6 +14,8 @@ class MySoundPool @Suppress("deprecation") constructor(
     srcQuality: Int
 ) : SoundPool(maxStreams, streamType, srcQuality), SoundPool.OnLoadCompleteListener {
 
+    private var tapSound: Int = 0
+    private var saveSound: Int = 0
     private val TAP = 1
     private val CHIME = 2
 
@@ -22,7 +24,7 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     fun playChimeSound() {
         if (CommonVariables.chimeLoaded && CommonVariables.playChimeSound)
-            play(CommonVariables.saveSound, 1f, 1f, 1, 0, 1f)
+            play(saveSound, 1f, 1f, 1, 0, 1f)
     }
 
     /**
@@ -30,7 +32,7 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     fun playSetSound() {
         if (CommonVariables.tapLoaded && CommonVariables.playTapSound)
-            play(CommonVariables.tapSound, 1f, 1f, 1, 0, 1f)
+            play(tapSound, 1f, 1f, 1, 0, 1f)
     }
 
     /**
@@ -44,8 +46,8 @@ class MySoundPool @Suppress("deprecation") constructor(
      *  Load the sounds to the sound pool
      */
     fun load(c: Context?) {
-        CommonVariables.saveSound = load(c, R.raw.imagesaved, 1)
-        CommonVariables.tapSound = load(c, R.raw.tap, 1)
+        saveSound = load(c, R.raw.imagesaved, 1)
+        tapSound = load(c, R.raw.tap, 1)
     }
 
     /**

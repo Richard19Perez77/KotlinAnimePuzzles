@@ -470,6 +470,7 @@ class FirstFragment : Fragment() {
             //return sound to device
             myMediaPlayer.abandonFocus()
         }
+        binding.puzzle.onResume()
     }
 
     /**

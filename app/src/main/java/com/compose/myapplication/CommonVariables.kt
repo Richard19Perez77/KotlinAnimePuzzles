@@ -22,12 +22,9 @@ object CommonVariables {
     @JvmField
     var imagesSaved = 0
     var blogLinksTraversed = 0
-    var isWindowInFocus = false
     @JvmField
     var musicSaved = 0
     var currentSoundPosition = 0
-    var tapSound = 0
-    var saveSound = 0
     var numberOfPieces = 0
     var currSlotOnTouchDown = 0
     var currSlotOnTouchUp = 0

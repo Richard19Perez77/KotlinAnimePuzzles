@@ -25,6 +25,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
     c, attrs
 ), SurfaceHolder.Callback {
 
+    private var ready: Boolean = false
     lateinit var fragment: FirstFragment
     private lateinit var toast: Toast
     private var defaultPuzzleSize = "2"
@@ -64,18 +65,6 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
         fullPaint = Paint()
     }
 
-    /**
-     * Sets the flag for window focus meaning its able to be interacted with.
-     *
-     * @param hasWindowFocus
-     */
-    override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
-        if (CommonVariables.isLogging) Log.d(
-            TAG,
-            "onWindowFocusChanged PuzzleSurface hasWindowFocus:$hasWindowFocus"
-        )
-        CommonVariables.isWindowInFocus = hasWindowFocus
-    }
 
     /**
      * On surface create this will be called once with the new screen sizes.
@@ -90,7 +79,9 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
         height: Int
     ) {
         if (CommonVariables.isLogging) Log.d(TAG, "surfaceChanged PuzzleSurface $width $height")
+
         puzzleUpdateAndDraw.surfaceChanged(width, height)
+
         if (CommonVariables.resumePreviousPuzzle) {
             resumePuzzle()
         } else {
@@ -126,7 +117,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
             if (event.action == MotionEvent.ACTION_UP) {
                 performClick()
             }
-            if (CommonVariables.isWindowInFocus && CommonVariables.isImageLoaded) {
+            if (ready && CommonVariables.isImageLoaded) {
                 return if (CommonVariables.isPuzzleSolved) {
                     fragment.toggleUIOverlay()
                     false
@@ -278,6 +269,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      */
     fun onPause() {
         if (CommonVariables.isLogging) Log.d(TAG, "onPause PuzzleSurface")
+        ready = false
         puzzleUpdateAndDraw.pause()
     }
 
@@ -292,6 +284,10 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
             CommonVariables.playTapSound = true
             showToast("Set Effect On")
         }
+    }
+
+    fun onResume() {
+        ready = true
     }
 
     /**
