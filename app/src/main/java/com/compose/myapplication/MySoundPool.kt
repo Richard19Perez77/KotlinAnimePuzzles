@@ -14,6 +14,8 @@ class MySoundPool @Suppress("deprecation") constructor(
     srcQuality: Int
 ) : SoundPool(maxStreams, streamType, srcQuality), SoundPool.OnLoadCompleteListener {
 
+    private var chimeLoaded: Boolean = false
+    private var tapLoaded: Boolean = false
     private var tapSound: Int = 0
     private var saveSound: Int = 0
     private val TAP = 1
@@ -23,7 +25,7 @@ class MySoundPool @Suppress("deprecation") constructor(
      * Check for sound file to be loaded and wanting to be player
      */
     fun playChimeSound() {
-        if (CommonVariables.chimeLoaded && CommonVariables.playChimeSound)
+        if (chimeLoaded && CommonVariables.playChimeSound)
             play(saveSound, 1f, 1f, 1, 0, 1f)
     }
 
@@ -31,7 +33,7 @@ class MySoundPool @Suppress("deprecation") constructor(
      * Check for tap sound to be loaded and it in preferences
      */
     fun playSetSound() {
-        if (CommonVariables.tapLoaded && CommonVariables.playTapSound)
+        if (tapLoaded && CommonVariables.playTapSound)
             play(tapSound, 1f, 1f, 1, 0, 1f)
     }
 
@@ -59,8 +61,8 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     override fun onLoadComplete(soundPool: SoundPool, sampleId: Int, status: Int) {
         if (sampleId == TAP)
-            CommonVariables.tapLoaded = true
+            tapLoaded = true
         else if (sampleId == CHIME)
-            CommonVariables.chimeLoaded = true
+            chimeLoaded = true
     }
 }

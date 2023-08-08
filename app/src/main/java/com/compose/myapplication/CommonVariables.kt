@@ -28,13 +28,9 @@ object CommonVariables {
     var numberOfPieces = 0
     var currSlotOnTouchDown = 0
     var currSlotOnTouchUp = 0
-    var inPlace = 0
     var screenH = 0
     var screenW = 0
     var currentPuzzleImagePosition = 0
-    var chimeLoaded = false
-    var evenlySplit = false
-    var tapLoaded = false
     var movingPiece = false
     var resumePreviousPuzzle = false
     var playChimeSound = true

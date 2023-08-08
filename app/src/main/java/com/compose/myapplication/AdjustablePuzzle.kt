@@ -146,35 +146,31 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * Find the sides of the device and split the puzzle into sections evenly across each side.
      */
     private fun assignXandYtoBorderPointIndex() {
-        CommonVariables.evenlySplit = false
-        while (!CommonVariables.evenlySplit) {
-            // get screen width and height to start splitting
-            var w = 0
-            if (null != CommonVariables.image) w = CommonVariables.image!!.width
-            var h = 0
-            if (CommonVariables.image != null) h = CommonVariables.image!!.height
-            val pieceW = w / xparts
-            val pieceH = h / yparts
-            CommonVariables.xs = IntArray(xparts)
-            for (i in 0 until xparts) {
-                CommonVariables.xs[i] = pieceW * i
+        // get screen width and height to start splitting
+        var w = 0
+        if (null != CommonVariables.image) w = CommonVariables.image!!.width
+        var h = 0
+        if (CommonVariables.image != null) h = CommonVariables.image!!.height
+        val pieceW = w / xparts
+        val pieceH = h / yparts
+        CommonVariables.xs = IntArray(xparts)
+        for (i in 0 until xparts) {
+            CommonVariables.xs[i] = pieceW * i
+        }
+        CommonVariables.ys = IntArray(yparts)
+        for (i in 0 until yparts) {
+            CommonVariables.ys[i] = pieceH * i
+        }
+        var acc = 0
+        for (i in CommonVariables.ys.indices) {
+            val tempy = CommonVariables.ys[i]
+            for (j in CommonVariables.xs.indices) {
+                val tempx = CommonVariables.xs[j]
+                setBorderPoint(acc, tempx, tempy)
+                setBitmapToPiece(acc, tempx, tempy, pieceW, pieceH)
+                setPointsToSlotAndPiece(acc, tempx, tempy, pieceW, pieceH)
+                acc++
             }
-            CommonVariables.ys = IntArray(yparts)
-            for (i in 0 until yparts) {
-                CommonVariables.ys[i] = pieceH * i
-            }
-            var acc = 0
-            for (i in CommonVariables.ys.indices) {
-                val tempy = CommonVariables.ys[i]
-                for (j in CommonVariables.xs.indices) {
-                    val tempx = CommonVariables.xs[j]
-                    setBorderPoint(acc, tempx, tempy)
-                    setBitmapToPiece(acc, tempx, tempy, pieceW, pieceH)
-                    setPointsToSlotAndPiece(acc, tempx, tempy, pieceW, pieceH)
-                    acc++
-                }
-            }
-            CommonVariables.evenlySplit = true
         }
     }
 
@@ -388,15 +384,15 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                 puzzleSurface.soundPool?.playSetSound()
 
                 // check for all images to by in place
-                CommonVariables.inPlace = 0
+                var inPlace = 0
                 for (i in 0 until CommonVariables.numberOfPieces) {
                     if (CommonVariables.puzzleSlots[i]?.slotNum == CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum) {
-                        CommonVariables.inPlace++
+                        inPlace++
                     }
                 }
 
                 // if all in place set as isPuzzleSolved
-                if (CommonVariables.inPlace == CommonVariables.numberOfPieces) {
+                if (inPlace == CommonVariables.numberOfPieces) {
                     addTimeToTimer()
                     CommonVariables.isPuzzleSolved = true
 
@@ -511,13 +507,13 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      * If all pieces are in the correct slot the puzzle is solved.
      */
     private fun checkToBeSolved() {
-        CommonVariables.inPlace = 0
+        var inPlace = 0
         for (i in 0 until CommonVariables.numberOfPieces) {
             if (CommonVariables.puzzleSlots[i]?.slotNum == CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum) {
-                CommonVariables.inPlace++
+                inPlace++
             }
         }
-        if (CommonVariables.inPlace == CommonVariables.numberOfPieces) {
+        if (inPlace == CommonVariables.numberOfPieces) {
             CommonVariables.isPuzzleSolved = true
         }
     }
