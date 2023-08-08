@@ -24,9 +24,10 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private var xparts = 0
     private var yparts = 0
     private var rand = Random()
-    private lateinit var image: Bitmap
-    private var TAG = ".AdjustablePuzzle"
 
+    private lateinit var image: Bitmap
+    private var imagesShown = ArrayList<Int>()
+    private var TAG = ".AdjustablePuzzle"
 
     fun getPreviousImageLoadedScaledDivided() {
         if (CommonVariables.isLogging) Log.d(
@@ -84,23 +85,23 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
             while (!CommonVariables.isPuzzleSplitCorrectly) {
 
                 // fill with all valid numbers
-                if (CommonVariables.imagesShown.isEmpty()) for (i in CommonVariables.data.artworks.indices) CommonVariables.imagesShown.add(
+                if (imagesShown.isEmpty()) for (i in CommonVariables.data.artworks.indices) imagesShown.add(
                     i
                 )
 
                 // get new index value from remaining images
                 CommonVariables.index =
-                    rand.nextInt(CommonVariables.imagesShown.size)
+                    rand.nextInt(imagesShown.size)
 
                 //edit to change to a direct image
                 //CommonVariables.index = 141;
 
                 // get the value at that index for new imageID
                 CommonVariables.currentPuzzleImagePosition =
-                    CommonVariables.imagesShown[CommonVariables.index]
+                    imagesShown[CommonVariables.index]
 
                 // remove from list to prevent duplicates
-                CommonVariables.imagesShown.removeAt(CommonVariables.index)
+                imagesShown.removeAt(CommonVariables.index)
 
                 // start decoding and scaling
                 image = CommonVariables.decodeSampledBitmapFromResource(
@@ -479,12 +480,12 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         CommonVariables.startPuzzle = Date()
     }
 
+    /**
+     * Get the current puzzle time so that it has second notation.
+     *
+     * @return
+     */
     val solveTime: Double
-        /**
-         * Get the current puzzle time so that it has second notation.
-         *
-         * @return
-         */
         get() = CommonVariables.currPuzzleTime / 1000.0
 
     /**

@@ -48,7 +48,6 @@ object CommonVariables {
 
     // the value is the piece to go into it
     lateinit var slotOrder: IntArray
-    var imagesShown = ArrayList<Int>()
     lateinit var puzzlePieces: Array<PuzzlePiece?>
     lateinit var puzzleSlots: Array<PuzzleSlot?>
     var dimensions = 0.0
