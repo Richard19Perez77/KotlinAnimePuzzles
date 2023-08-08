@@ -24,7 +24,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private var xparts = 0
     private var yparts = 0
     private var rand = Random()
-    private var TAG = "com.compose.myapplication.AdjustablePuzzle"
+    private lateinit var image: Bitmap
+    private var TAG = ".AdjustablePuzzle"
 
 
     fun getPreviousImageLoadedScaledDivided() {
@@ -43,13 +44,13 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
             while (!CommonVariables.isPuzzleSplitCorrectly) {
                 // get new index value and then remove index
                 CommonVariables.index = CommonVariables.currentPuzzleImagePosition
-                CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
+                image = CommonVariables.decodeSampledBitmapFromResource(
                     puzzleSurface.context.resources,
                     CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
                     CommonVariables.screenW, CommonVariables.screenH
                 )
-                CommonVariables.image = Bitmap.createScaledBitmap(
-                    CommonVariables.image!!,
+                image = Bitmap.createScaledBitmap(
+                    image,
                     CommonVariables.screenW, CommonVariables.screenH, true
                 )
                 CommonVariables.isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
@@ -102,13 +103,13 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                 CommonVariables.imagesShown.removeAt(CommonVariables.index)
 
                 // start decoding and scaling
-                CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
+                image = CommonVariables.decodeSampledBitmapFromResource(
                     puzzleSurface.context.resources,
                     CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
                     CommonVariables.screenW, CommonVariables.screenH
                 )
-                CommonVariables.image = Bitmap.createScaledBitmap(
-                    CommonVariables.image!!,
+                image = Bitmap.createScaledBitmap(
+                    image,
                     CommonVariables.screenW, CommonVariables.screenH, true
                 )
                 CommonVariables.isPuzzleSplitCorrectly = divideBitmap()
@@ -150,10 +151,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      */
     private fun assignXandYtoBorderPointIndex() {
         // get screen width and height to start splitting
-        var w = 0
-        if (null != CommonVariables.image) w = CommonVariables.image!!.width
-        var h = 0
-        if (CommonVariables.image != null) h = CommonVariables.image!!.height
+        val w: Int = image.width
+        val h: Int = image.height
         val pieceW = w / xparts
         val pieceH = h / yparts
         CommonVariables.xs = IntArray(xparts)
@@ -259,7 +258,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
             CommonVariables.puzzlePieces[i]?.bitmap!!.recycle()
         }
         CommonVariables.puzzlePieces[i]?.bitmap = null
-        CommonVariables.puzzlePieces[i]?.bitmap = CommonVariables.image?.let {
+        CommonVariables.puzzlePieces[i]?.bitmap = image.let {
             Bitmap.createBitmap(
                 it, x, y,
                 bitmapW, bitmapH
