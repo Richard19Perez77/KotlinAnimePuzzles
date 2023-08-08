@@ -25,17 +25,44 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
     c, attrs
 ), SurfaceHolder.Callback {
 
-    var soundPool: MySoundPool? = null
+    lateinit var fragment: FirstFragment
+    private lateinit var toast: Toast
+    private var defaultPuzzleSize = "2"
+    var puzzleUpdateAndDraw: PuzzleUpdateAndDraw
+
     var borderPaintA: Paint
     var borderPaintB: Paint
     var transPaint: Paint
     var fullPaint: Paint
-    var puzzle: AdjustablePuzzle? = null
-    var puzzleUpdateAndDraw: PuzzleUpdateAndDraw?
+
     var myMediaPlayer: MyMediaPlayer? = null
-    private var ps: PuzzleSurface = this
-    private var defaultPuzzleSize = "2"
-    lateinit var fragment: FirstFragment
+    var soundPool: MySoundPool? = null
+    var puzzle: AdjustablePuzzle
+
+
+    init {
+        // set context for access in other classes
+
+        // register our interest in hearing about changes to our surface
+        val holder = holder
+        holder.addCallback(this)
+        puzzle = AdjustablePuzzle(this)
+        puzzleUpdateAndDraw = PuzzleUpdateAndDraw(holder)
+        borderPaintA = Paint()
+        borderPaintA.style = Paint.Style.STROKE
+        borderPaintA.strokeWidth = STROKE_VALUE.toFloat()
+        borderPaintA.color = Color.LTGRAY
+        borderPaintA.alpha = TRANS_VALUE
+        borderPaintB = Paint()
+        borderPaintB.style = Paint.Style.STROKE
+        borderPaintB.strokeWidth = STROKE_VALUE.toFloat()
+        borderPaintB.color = Color.DKGRAY
+        borderPaintB.alpha = TRANS_VALUE
+        transPaint = Paint()
+        transPaint.alpha = TRANS_VALUE
+        transPaint.style = Paint.Style.FILL
+        fullPaint = Paint()
+    }
 
     /**
      * Sets the flag for window focus meaning its able to be interacted with.
@@ -47,12 +74,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
             TAG,
             "onWindowFocusChanged PuzzleSurface hasWindowFocus:$hasWindowFocus"
         )
-        if (!hasWindowFocus) {
-            CommonVariables.isWindowInFocus = false
-        } else {
-            CommonVariables.isWindowInFocus = true
-            puzzleUpdateAndDraw?.updateAndDraw()
-        }
+        CommonVariables.isWindowInFocus = hasWindowFocus
     }
 
     /**
@@ -68,7 +90,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
         height: Int
     ) {
         if (CommonVariables.isLogging) Log.d(TAG, "surfaceChanged PuzzleSurface $width $height")
-        puzzleUpdateAndDraw!!.surfaceChanged(width, height)
+        puzzleUpdateAndDraw.surfaceChanged(width, height)
         if (CommonVariables.resumePreviousPuzzle) {
             resumePuzzle()
         } else {
@@ -83,7 +105,6 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      */
     override fun surfaceCreated(holder: SurfaceHolder) {
         if (CommonVariables.isLogging) Log.d(TAG, "surfaceCreated PuzzleSurface")
-        puzzleUpdateAndDraw = PuzzleUpdateAndDraw(holder)
     }
 
     override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -101,7 +122,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      * actions.
      */
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        synchronized(puzzleUpdateAndDraw!!.surfaceHolder) {
+        synchronized(puzzleUpdateAndDraw.surfaceHolder) {
             if (event.action == MotionEvent.ACTION_UP) {
                 performClick()
             }
@@ -110,7 +131,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
                     fragment.toggleUIOverlay()
                     false
                 } else {
-                    puzzle!!.onTouchEvent(event)
+                    puzzle.onTouchEvent(event)
                 }
             }
             return super.onTouchEvent(event)
@@ -125,9 +146,9 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
     private fun createNewSizedPuzzle(sides: Int) {
         if (CommonVariables.isLogging) Log.d(TAG, "createNewSizedPuzzle PuzzleSurface")
         CommonVariables.isImageLoaded = false
-        puzzle = AdjustablePuzzle(ps)
-        puzzle!!.initPieces(sides)
-        puzzle!!.getNewImageLoadedScaledDivided()
+
+        puzzle.initPieces(sides)
+        puzzle.getNewImageLoadedScaledDivided()
         fragment.hideButtons()
     }
 
@@ -137,9 +158,8 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
     private fun createPuzzle() {
         if (CommonVariables.isLogging) Log.d(TAG, "createPuzzle PuzzleSurface")
         CommonVariables.isImageLoaded = false
-        puzzle = AdjustablePuzzle(ps)
-        puzzle!!.initPieces(3)
-        puzzle!!.getNewImageLoadedScaledDivided()
+        puzzle.initPieces(3)
+        puzzle.getNewImageLoadedScaledDivided()
         fragment.hideButtons()
     }
 
@@ -149,11 +169,9 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
     private fun resumePuzzle() {
         if (CommonVariables.isLogging) Log.d(TAG, "resumePuzzle PuzzleSurface")
         CommonVariables.isImageLoaded = false
-        puzzle = AdjustablePuzzle(ps)
         val sides = CommonVariables.dimensions.toInt()
-        puzzle!!.initPieces(sides)
-        puzzle!!.getPreviousImageLoadedScaledDivided()
-        fragment.hideButtons()
+        puzzle.initPieces(sides)
+        puzzle.getPreviousImageLoadedScaledDivided()
     }
 
     val slotString: String
@@ -209,31 +227,6 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
         dialog = builder.show()
     }
 
-    private lateinit var toast: Toast
-
-    init {
-        // set context for access in other classes
-
-        // register our interest in hearing about changes to our surface
-        val holder = holder
-        holder.addCallback(this)
-        borderPaintA = Paint()
-        borderPaintA.style = Paint.Style.STROKE
-        borderPaintA.strokeWidth = STROKE_VALUE.toFloat()
-        borderPaintA.color = Color.LTGRAY
-        borderPaintA.alpha = TRANS_VALUE
-        borderPaintB = Paint()
-        borderPaintB.style = Paint.Style.STROKE
-        borderPaintB.strokeWidth = STROKE_VALUE.toFloat()
-        borderPaintB.color = Color.DKGRAY
-        borderPaintB.alpha = TRANS_VALUE
-        transPaint = Paint()
-        transPaint.alpha = TRANS_VALUE
-        transPaint.style = Paint.Style.FILL
-        fullPaint = Paint()
-        puzzleUpdateAndDraw = PuzzleUpdateAndDraw(holder)
-    }
-
     private fun showToast(message: String?) {
         // Create and show toast for save photo
         toast = Toast.makeText(context, message, Toast.LENGTH_SHORT)
@@ -285,9 +278,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
      */
     fun onPause() {
         if (CommonVariables.isLogging) Log.d(TAG, "onPause PuzzleSurface")
-        if (puzzleUpdateAndDraw != null) {
-            puzzleUpdateAndDraw!!.pause()
-        }
+        puzzleUpdateAndDraw.pause()
     }
 
     /**
@@ -524,7 +515,7 @@ class PuzzleSurface(c : Context, attrs: AttributeSet?) : SurfaceView(
         }
 
         fun pause() {
-            synchronized(surfaceHolder) { if (puzzle != null) puzzle!!.pause() }
+            synchronized(surfaceHolder) { puzzle.pause() }
         }
     }
 

@@ -271,8 +271,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     /**
      * Make a call to the update and draw method in the puzzle surface.
      */
-    fun updateAndDraw() {
-        puzzleSurface.puzzleUpdateAndDraw?.updateAndDraw()
+    private fun updateAndDraw() {
+        puzzleSurface.puzzleUpdateAndDraw.updateAndDraw()
     }
 
     /**
@@ -476,7 +476,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     /**
      * Reset the current puzzle solve timer.
      */
-    fun resetTimer() {
+    private fun resetTimer() {
         CommonVariables.currPuzzleTime = 0
         CommonVariables.startPuzzle = Date()
     }
@@ -510,7 +510,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     /**
      * If all pieces are in the correct slot the puzzle is solved.
      */
-    fun checkToBeSolved() {
+    private fun checkToBeSolved() {
         CommonVariables.inPlace = 0
         for (i in 0 until CommonVariables.numberOfPieces) {
             if (CommonVariables.puzzleSlots[i]?.slotNum == CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum) {
