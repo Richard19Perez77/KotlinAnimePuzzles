@@ -61,7 +61,6 @@ object CommonVariables {
     var image: Bitmap? = null
     lateinit var puzzlePieces: Array<PuzzlePiece?>
     lateinit var puzzleSlots: Array<PuzzleSlot?>
-    // var volume = 0f
     var mySoundPool: MySoundPool? = null
     var dimensions = 0.0
     lateinit var points: Array<Point?>
