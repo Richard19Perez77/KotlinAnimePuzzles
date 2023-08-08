@@ -54,10 +54,7 @@ object CommonVariables {
     var puzzlesSolved = 0
     var isLogging = false
     var isImageLoaded = false
-    var isPuzzleSplitCorrectly = false
     var isPuzzleSolved = false
-    var index = 0
-    var piecesComplete = 0
     var isImageError = false
     var startPuzzle = Date()
     var stopPuzzle = Date()

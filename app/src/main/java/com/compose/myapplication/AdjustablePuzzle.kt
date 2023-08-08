@@ -29,6 +29,9 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private var xparts = 0
     private var yparts = 0
 
+    private var piecesComplete = 0
+    private var index = 0
+
     private var TAG = ".AdjustablePuzzle"
 
     fun getPreviousImageLoadedScaledDivided() {
@@ -41,12 +44,12 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         customScope.launch {
             // Your coroutine code
 
-            CommonVariables.isPuzzleSplitCorrectly = false
+            var isPuzzleSplitCorrectly = false
             CommonVariables.isPuzzleSolved = false
 
-            while (!CommonVariables.isPuzzleSplitCorrectly) {
+            while (!isPuzzleSplitCorrectly) {
                 // get new index value and then remove index
-                CommonVariables.index = CommonVariables.currentPuzzleImagePosition
+                index = CommonVariables.currentPuzzleImagePosition
                 image = CommonVariables.decodeSampledBitmapFromResource(
                     puzzleSurface.context.resources,
                     CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
@@ -56,8 +59,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                     image,
                     CommonVariables.screenW, CommonVariables.screenH, true
                 )
-                CommonVariables.isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
-                if (CommonVariables.isPuzzleSplitCorrectly) {
+                isPuzzleSplitCorrectly = divideBitmapFromPreviousPuzzle()
+                if (isPuzzleSplitCorrectly) {
                     CommonVariables.isImageError = false
                     puzzleSurface.soundPool?.playChimeSound()
                     CommonVariables.isImageLoaded = true
@@ -79,12 +82,12 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
             "getNewImageLoadedScaledDivided AdjustablePuzzleImpl"
         )
 
-        CommonVariables.isPuzzleSplitCorrectly = false
+        var isPuzzleSplitCorrectly = false
         CommonVariables.isPuzzleSolved = false
 
         val customScope = CoroutineScope(Dispatchers.Default)
         customScope.launch {
-            while (!CommonVariables.isPuzzleSplitCorrectly) {
+            while (!isPuzzleSplitCorrectly) {
 
                 // fill with all valid numbers
                 if (imagesShown.isEmpty()) for (i in CommonVariables.data.artworks.indices) imagesShown.add(
@@ -92,7 +95,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                 )
 
                 // get new index value from remaining images
-                CommonVariables.index =
+                index =
                     rand.nextInt(imagesShown.size)
 
                 //edit to change to a direct image
@@ -100,10 +103,10 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
 
                 // get the value at that index for new imageID
                 CommonVariables.currentPuzzleImagePosition =
-                    imagesShown[CommonVariables.index]
+                    imagesShown[index]
 
                 // remove from list to prevent duplicates
-                imagesShown.removeAt(CommonVariables.index)
+                imagesShown.removeAt(index)
 
                 // start decoding and scaling
                 image = CommonVariables.decodeSampledBitmapFromResource(
@@ -115,8 +118,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                     image,
                     CommonVariables.screenW, CommonVariables.screenH, true
                 )
-                CommonVariables.isPuzzleSplitCorrectly = divideBitmap()
-                if (CommonVariables.isPuzzleSplitCorrectly) {
+                isPuzzleSplitCorrectly = divideBitmap()
+                if (isPuzzleSplitCorrectly) {
                     resetTimer()
                     CommonVariables.isImageError = false
                     puzzleSurface.soundPool?.playChimeSound()
@@ -199,10 +202,10 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      */
     private fun divideBitmapFromPreviousPuzzle(): Boolean {
         CommonVariables.initPrevDivideBitmap(pieces)
-        CommonVariables.piecesComplete = 0
+        piecesComplete = 0
         assignXandYtoBorderPointIndex()
         CommonVariables.assignSlotOrder()
-        return CommonVariables.piecesComplete == pieces
+        return piecesComplete == pieces
     }
 
     /**
@@ -212,14 +215,14 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      */
     private fun divideBitmap(): Boolean {
         CommonVariables.initDivideBitmap(pieces)
-        CommonVariables.piecesComplete = 0
+        piecesComplete = 0
         assignXandYtoBorderPointIndex()
         var randomSlots: Boolean
         do {
             switchEveryIndexWithRandomIndex()
             randomSlots = CommonVariables.assignSlotOrder()
         } while (!randomSlots)
-        return CommonVariables.piecesComplete == pieces
+        return piecesComplete == pieces
     }
 
     /**
@@ -244,7 +247,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum = i
         CommonVariables.puzzleSlots[i]?.slotNum =
             CommonVariables.puzzleSlots[i]?.puzzlePiece?.pieceNum!!
-        CommonVariables.piecesComplete++
+        piecesComplete++
     }
 
     /**
