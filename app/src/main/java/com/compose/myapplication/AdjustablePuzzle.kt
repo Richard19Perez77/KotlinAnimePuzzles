@@ -8,6 +8,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.Random
+
 
 /**
  * The adjustable puzzle class scales the puzzle to different sizes in one class.
@@ -21,6 +23,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
     private var pieces = 0
     private var xparts = 0
     private var yparts = 0
+    private var rand = Random()
     private var TAG = "com.compose.myapplication.AdjustablePuzzle"
 
 
@@ -86,7 +89,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
 
                 // get new index value from remaining images
                 CommonVariables.index =
-                    CommonVariables.rand.nextInt(CommonVariables.imagesShown.size)
+                    rand.nextInt(CommonVariables.imagesShown.size)
 
                 //edit to change to a direct image
                 //CommonVariables.index = 141;
@@ -132,7 +135,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
         // for every slot index
         for (i in CommonVariables.slotOrder.indices) {
             // get a new index
-            val switchIndex = CommonVariables.rand.nextInt(CommonVariables.slotOrder.size)
+            val switchIndex = rand.nextInt(CommonVariables.slotOrder.size)
             // save original index
             val tempValue = CommonVariables.slotOrder[i]
             // set new index into it
