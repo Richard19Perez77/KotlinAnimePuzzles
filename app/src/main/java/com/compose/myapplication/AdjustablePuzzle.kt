@@ -41,7 +41,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
                 // get new index value and then remove index
                 CommonVariables.index = CommonVariables.currentPuzzleImagePosition
                 CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
-                    CommonVariables.res,
+                    puzzleSurface.context.resources,
                     CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
                     CommonVariables.screenW, CommonVariables.screenH
                 )
@@ -100,7 +100,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
 
                 // start decoding and scaling
                 CommonVariables.image = CommonVariables.decodeSampledBitmapFromResource(
-                    CommonVariables.res,
+                    puzzleSurface.context.resources,
                     CommonVariables.data.artworks[CommonVariables.currentPuzzleImagePosition].imageID,
                     CommonVariables.screenW, CommonVariables.screenH
                 )

@@ -145,7 +145,6 @@ class FirstFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        CommonVariables.res = requireContext().resources
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         return binding.root
     }

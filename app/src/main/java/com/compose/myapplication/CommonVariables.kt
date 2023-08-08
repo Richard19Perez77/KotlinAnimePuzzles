@@ -50,7 +50,6 @@ object CommonVariables {
     lateinit var slotOrder: IntArray
     var imagesShown = ArrayList<Int>()
     var rand = Random()
-    var res: Resources? = null
     var image: Bitmap? = null
     lateinit var puzzlePieces: Array<PuzzlePiece?>
     lateinit var puzzleSlots: Array<PuzzleSlot?>
