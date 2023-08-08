@@ -236,7 +236,6 @@ class FirstFragment : Fragment() {
         }
 
         binding.puzzle.fragment = this
-        binding.puzzle.soundPool = mySoundPool
     }
 
     class PermissionResultContract : ActivityResultContract<String, Boolean>() {
@@ -693,6 +692,7 @@ class FirstFragment : Fragment() {
         mySoundPool = MySoundPool(15, AudioManager.STREAM_MUSIC, 100)
         mySoundPool.init()
         mySoundPool.load(context)
+        binding.puzzle.soundPool = mySoundPool
     }
 
 
