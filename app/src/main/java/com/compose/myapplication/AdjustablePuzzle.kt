@@ -31,6 +31,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
 
     private var piecesComplete = 0
     private var index = 0
+    private var startPuzzle = Date()
+    private var stopPuzzle = Date()
 
     private var TAG = ".AdjustablePuzzle"
 
@@ -441,8 +443,8 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      */
     private fun addTimeToTimer() {
         if (!CommonVariables.isPuzzleSolved) {
-            CommonVariables.stopPuzzle = Date()
-            CommonVariables.currPuzzleTime += (CommonVariables.stopPuzzle.time - CommonVariables.startPuzzle.time)
+            stopPuzzle = Date()
+            CommonVariables.currPuzzleTime += (stopPuzzle.time - startPuzzle.time)
         }
     }
 
@@ -482,7 +484,7 @@ class AdjustablePuzzle(private var puzzleSurface: PuzzleSurface) {
      */
     private fun resetTimer() {
         CommonVariables.currPuzzleTime = 0
-        CommonVariables.startPuzzle = Date()
+        startPuzzle = Date()
     }
 
     /**

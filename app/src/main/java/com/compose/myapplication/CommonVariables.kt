@@ -4,7 +4,6 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
-import java.util.Date
 
 /**
  * A class to hold variables that will be used across classes and the more
@@ -56,8 +55,6 @@ object CommonVariables {
     var isImageLoaded = false
     var isPuzzleSolved = false
     var isImageError = false
-    var startPuzzle = Date()
-    var stopPuzzle = Date()
     var currPuzzleTime: Long = 0
     var fourRecordSolveTime: Long = 0
     var nineRecordSolveTime: Long = 0
