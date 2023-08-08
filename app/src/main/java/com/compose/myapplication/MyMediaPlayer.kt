@@ -85,8 +85,8 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
                     c?.let { mediaPlayer?.setDataSource(it, path) }
                     currentState = State.Initialized
                     mediaPlayer?.setAudioStreamType(AudioManager.STREAM_MUSIC)
-                    mediaPlayer?.setVolume(CommonVariables.volume, CommonVariables.volume)
-                    currentVolume = CommonVariables.volume
+                    mediaPlayer?.setVolume(1f, 1f)
+                    // currentVolume = CommonVariables.volume
                     mediaPlayer?.isLooping = true
                     mediaPlayer?.prepareAsync()
                     currentState = State.Preparing
@@ -147,7 +147,7 @@ class MyMediaPlayer(private var c: Context?) : OnPreparedListener, MediaPlayer.O
                 if (mediaPlayer == null) init() else if (mediaPlayer?.isPlaying == false) {
                     start()
                 } else {
-                    mediaPlayer?.setVolume(CommonVariables.volume, CommonVariables.volume)
+                    mediaPlayer?.setVolume(1f,1f)
                 }
 
             AudioManager.AUDIOFOCUS_LOSS ->                 // lost focus for an unbounded amount of time. stop and release

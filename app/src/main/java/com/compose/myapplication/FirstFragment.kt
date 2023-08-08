@@ -490,9 +490,7 @@ class FirstFragment : Fragment() {
         getSharedPrefs()
         val audioManager = activity?.getSystemService(Context.AUDIO_SERVICE) as AudioManager
         val streamVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat()
-        CommonVariables.volume =
-            (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-                .toFloat())
+        // CommonVariables.volume = (streamVolume / audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat())
         noisyAudioStreamReceiver = NoisyAudioStreamReceiver()
         startPlayback()
         if (CommonVariables.playMusic) {

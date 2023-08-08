@@ -23,7 +23,7 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     fun playChimeSound() {
         if (CommonVariables.chimeLoaded && CommonVariables.playChimeSound)
-            play(CommonVariables.saveSound, CommonVariables.volume, CommonVariables.volume, 1, 0, 1f)
+            play(CommonVariables.saveSound, 1f, 1f, 1, 0, 1f)
     }
 
     /**
@@ -31,7 +31,7 @@ class MySoundPool @Suppress("deprecation") constructor(
      */
     fun playSetSound() {
         if (CommonVariables.tapLoaded && CommonVariables.playTapSound)
-            play(CommonVariables.tapSound, CommonVariables.volume, CommonVariables.volume, 1, 0, 1f)
+            play(CommonVariables.tapSound, 1f, 1f, 1, 0, 1f)
     }
 
     /**
