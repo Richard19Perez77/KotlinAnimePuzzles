@@ -201,20 +201,6 @@ class FirstFragment : Fragment() {
                 val PERMISSION_WRITE_EXTERNAL_STORAGE =
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 requestPermissionLauncherPhoto.launch(PERMISSION_WRITE_EXTERNAL_STORAGE)
-
-
-//                // permission check needed
-//                requestWritePermission {
-//                    val coroutineScope = CoroutineScope(Dispatchers.Main)
-//                    coroutineScope.launch {
-//                        val result =
-//                            SavePhoto(context, CommonVariables.currentPuzzleImagePosition).run {
-//                                run()
-//                            }
-//                        if (result) showToast("Success!") else showToast("Error!")
-//
-//                    }
-//                }
             }
         }
 
@@ -231,11 +217,6 @@ class FirstFragment : Fragment() {
                 val PERMISSION_WRITE_EXTERNAL_STORAGE =
                     android.Manifest.permission.WRITE_EXTERNAL_STORAGE
                 requestPermissionLauncherMusic.launch(PERMISSION_WRITE_EXTERNAL_STORAGE)
-
-//                requestWritePermission {
-//                    val intent = Intent(requireContext(), SaveMusicService::class.java)
-//                    requireContext().startService(intent)
-//                }
             }
         }
 
