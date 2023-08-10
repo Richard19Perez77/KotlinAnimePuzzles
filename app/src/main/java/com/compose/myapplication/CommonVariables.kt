@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Point
+import kotlin.math.roundToInt
 
 /**
  * A class to hold variables that will be used across classes and the more
@@ -12,8 +13,6 @@ import android.graphics.Point
  * @author Rick
  */
 object CommonVariables {
-
-    private const val TAG = "puzzleLog"
 
     @JvmField
     var data = Data()
@@ -117,7 +116,7 @@ object CommonVariables {
      * @param reqHeight
      * @return
      */
-    fun calculateInSampleSize(
+    private fun calculateInSampleSize(
         options: BitmapFactory.Options,
         reqWidth: Int, reqHeight: Int
     ): Int {
@@ -129,8 +128,8 @@ object CommonVariables {
 
             // Calculate ratios of height and width to requested height and
             // width
-            val heightRatio = Math.round(height.toFloat() / reqHeight.toFloat())
-            val widthRatio = Math.round(width.toFloat() / reqWidth.toFloat())
+            val heightRatio = (height.toFloat() / reqHeight.toFloat()).roundToInt()
+            val widthRatio = (width.toFloat() / reqWidth.toFloat()).roundToInt()
 
             // Choose the smallest ratio as inSampleSize value, this will
             // guarantee a final image with both dimensions larger than or equal
@@ -173,8 +172,7 @@ object CommonVariables {
      * A method to switch a piece in the puzzle.
      */
     fun sendPieceToNewSlot(a: Int, z: Int) {
-        val temp: PuzzlePiece
-        temp = puzzleSlots[currSlotOnTouchDown]!!.puzzlePiece
+        val temp: PuzzlePiece = puzzleSlots[currSlotOnTouchDown]!!.puzzlePiece
         puzzleSlots[a]!!.puzzlePiece = puzzleSlots[z]!!.puzzlePiece
         puzzleSlots[a]!!.puzzlePiece.px = puzzleSlots[a]!!.sx
         puzzleSlots[a]!!.puzzlePiece.py = puzzleSlots[a]!!.sy
