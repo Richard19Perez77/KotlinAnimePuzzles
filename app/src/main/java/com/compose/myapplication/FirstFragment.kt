@@ -28,7 +28,6 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat.checkSelfPermission
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.compose.myapplication.databinding.FragmentFirstBinding
@@ -51,6 +50,8 @@ class FirstFragment : Fragment() {
     companion object {
         const val PUZZLE_LOG = "puzzleLog"
         const val TAG = "com.compose.myapplication.FirstFragment"
+        const val EXTRA_PERMISSION_GRANT_RESULTS =
+            "androidx.activity.result.contract.extra.PERMISSION_GRANT_RESULTS"
 
         enum class PHOTO_RESULT {
             SAVED,
@@ -173,7 +174,7 @@ class FirstFragment : Fragment() {
         binding.nextButton.setOnClickListener {
             hideButtons()
             CommonVariables.isImageLoaded = false
-            binding.puzzle.puzzle?.getNewImageLoadedScaledDivided()
+            binding.puzzle.puzzle.getNewImageLoadedScaledDivided()
 
             val animation = AnimationUtils.loadAnimation(context, R.anim.fade_out)
             val animationListener: Animation.AnimationListener =
@@ -227,10 +228,14 @@ class FirstFragment : Fragment() {
                     if (result) showToast("Success!") else showToast("Error!")
                 }
             } else {
-                requestWritePermission {
-                    val intent = Intent(requireContext(), SaveMusicService::class.java)
-                    requireContext().startService(intent)
-                }
+                val PERMISSION_WRITE_EXTERNAL_STORAGE =
+                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+                requestPermissionLauncherMusic.launch(PERMISSION_WRITE_EXTERNAL_STORAGE)
+
+//                requestWritePermission {
+//                    val intent = Intent(requireContext(), SaveMusicService::class.java)
+//                    requireContext().startService(intent)
+//                }
             }
         }
 
@@ -248,7 +253,7 @@ class FirstFragment : Fragment() {
         override fun parseResult(resultCode: Int, intent: Intent?): Boolean {
             if (intent == null || resultCode != Activity.RESULT_OK) return false
             val grantResults =
-                intent.getIntArrayExtra(RequestMultiplePermissions.EXTRA_PERMISSION_GRANT_RESULTS)
+                intent.getIntArrayExtra(EXTRA_PERMISSION_GRANT_RESULTS)
             if (grantResults == null || grantResults.isEmpty()) return false
             return grantResults[0] == PackageManager.PERMISSION_GRANTED
         }
@@ -283,37 +288,10 @@ class FirstFragment : Fragment() {
                             PHOTO_RESULT.EXISTS ->
                                 showToast("Exists!")
 
-                            else -> {}
                         }
                     }
                 }
             })
-
-    private fun requestWritePermission(onPermissionGranted: () -> Unit) {
-        if (checkSelfPermission(
-                requireContext(),
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            (reqLauncher.contract as RequestPermissionResultContract).onPermissionGranted =
-                onPermissionGranted
-            reqLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        } else {
-            onPermissionGranted()
-        }
-    }
-
-    // ref = https://stackoverflow.com/a/66552678
-    private val reqLauncher =
-        registerForActivityResult(RequestPermissionResultContract()) { result ->
-            if (result) {
-                Log.d("RDTest", "onActivityResult: PERMISSION GRANTED")
-                //since we want dynamic callback, we set callback before reqLauncher.launch. And just print log here.
-            } else {
-                Toast.makeText(requireContext(), "Permission denied!", Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     suspend fun saveImageQ(): Boolean = withContext(Dispatchers.IO) {
@@ -398,8 +376,7 @@ class FirstFragment : Fragment() {
                 out = resolver.openOutputStream(uri)!!
                 inputStream.copyTo(out)
                 inputStream.close()
-                assert(out != null)
-                out!!.close()
+                out.close()
             }
             cachedImgFile.delete()
             CommonVariables.musicSaved++
@@ -412,7 +389,7 @@ class FirstFragment : Fragment() {
             } catch (e: IOException) { /* handle */
             }
             try {
-                out?.close()
+                out.close()
             } catch (e: IOException) { /*handle */
             }
         }
@@ -525,7 +502,7 @@ class FirstFragment : Fragment() {
         if (isValid) {
             if (sharedpreferences.contains(getString(R.string.SLOTS))) {
                 slots = sharedpreferences.getString(getString(R.string.SLOTS), "").toString()
-                if (slots == "" || slots!!.length < 2) {
+                if (slots == "" || slots.length < 2) {
                     isValid = false
                 } else {
                     val slotArr = slots.split(",".toRegex()).dropLastWhile { it.isEmpty() }
@@ -882,7 +859,7 @@ class FirstFragment : Fragment() {
         if (CommonVariables.isLogging) Log.d(TAG, "updatePhysics PuzzleSurface")
 
         if (CommonVariables.isPuzzleSolved) {
-            val solveTime = "Solve time = " + (binding.puzzle.puzzle?.solveTime ?: 0) + " secs."
+            val solveTime = "Solve time = " + binding.puzzle.puzzle.solveTime + " secs."
             val coroutineScope = CoroutineScope(Dispatchers.Main)
             coroutineScope.launch {
                 binding.scoreText.text = solveTime
