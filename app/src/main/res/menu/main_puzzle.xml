@@ -8,27 +8,27 @@
         android:id="@+id/menu_stats"
         android:icon="@drawable/ic_launcher_background"
         android:title="@string/menu_stats"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/new_puzzle"
         android:icon="@drawable/ic_launcher_background"
         android:title="@string/new_puzzle"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="always" />
     <item
         android:id="@+id/set_toggle"
         android:title="@string/set_toggle"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/win_toggle"
         android:title="@string/win_toggle"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/border_toggle"
         android:title="@string/border_toggle"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/music_toggle"
         android:title="@string/music_toggle"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
 </menu>
