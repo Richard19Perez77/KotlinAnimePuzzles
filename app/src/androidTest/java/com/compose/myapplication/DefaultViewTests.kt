@@ -11,7 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 
 /**
- * View tests for puzzle on default non solved puzzle, test views visible
+ * View tests for puzzle on default non solved puzzle, test views visible and title
  *
  * @constructor Create empty View tests
  */
