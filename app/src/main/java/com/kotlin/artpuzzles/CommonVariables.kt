@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 import android.content.res.Resources
 import android.graphics.Bitmap

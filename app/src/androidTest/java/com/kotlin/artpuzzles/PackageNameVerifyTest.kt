@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
@@ -17,6 +17,6 @@ class PackageNameVerifyTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.compose.myapplication", appContext.packageName)
+        assertEquals("com.kotlin.artpuzzles", appContext.packageName)
     }
 }

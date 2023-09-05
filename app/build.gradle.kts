@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace = "com.compose.myapplication"
+    namespace = "com.kotlin.artpuzzles"
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.compose.myapplication"
+        applicationId = "com.kotlin.artpuzzles"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

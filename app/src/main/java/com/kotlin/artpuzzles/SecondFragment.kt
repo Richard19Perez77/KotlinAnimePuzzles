@@ -1,11 +1,11 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.compose.myapplication.databinding.FragmentSecondBinding
+import com.kotlin.artpuzzles.databinding.FragmentSecondBinding
 
 
 /**
@@ -14,7 +14,7 @@ import com.compose.myapplication.databinding.FragmentSecondBinding
 class SecondFragment : Fragment() {
 
     companion object{
-        const val TAG = "com.compose.myapplication.PuzzleStatsFragment"
+        const val TAG = "com.kotlin.artpuzzles.PuzzleStatsFragment"
     }
 
     private var _binding: FragmentSecondBinding? = null

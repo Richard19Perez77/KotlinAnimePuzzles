@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.assertion.ViewAssertions.matches

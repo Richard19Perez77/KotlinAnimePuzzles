@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -12,8 +12,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.compose.myapplication.databinding.ActivityMainBinding
-
+import com.kotlin.artpuzzles.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 import android.app.IntentService
 import android.content.Intent

@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 /**
  * A class to hold a piece of artwork, this includes the title of artists and artwork as well as the link to the artist and an imageID from resources.

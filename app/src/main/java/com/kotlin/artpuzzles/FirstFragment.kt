@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 import android.app.Activity
 import android.content.BroadcastReceiver
@@ -30,7 +30,7 @@ import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.compose.myapplication.databinding.FragmentFirstBinding
+import com.kotlin.artpuzzles.databinding.FragmentFirstBinding
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -49,7 +49,7 @@ class FirstFragment : Fragment() {
 
     companion object {
         const val PUZZLE_LOG = "puzzleLog"
-        const val TAG = "com.compose.myapplication.FirstFragment"
+        const val TAG = "com.kotlin.artpuzzles.FirstFragment"
         const val EXTRA_PERMISSION_GRANT_RESULTS =
             "androidx.activity.result.contract.extra.PERMISSION_GRANT_RESULTS"
 

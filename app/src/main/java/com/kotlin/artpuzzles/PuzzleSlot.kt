@@ -1,4 +1,4 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
 
 /**
  * A class to hold the piece and coordinates of the puzzle piece frame as well

@@ -1,4 +1,7 @@
-package com.compose.myapplication
+package com.kotlin.artpuzzles
+
+import com.kotlin.artpuzzles.Artwork
+import com.kotlin.artpuzzles.R
 
 /**
  * A class to hold the static data used across the application.

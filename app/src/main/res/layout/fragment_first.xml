@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.compose.myapplication.PuzzleSurface
+        <com.kotlin.artpuzzles.PuzzleSurface
             android:id="@+id/puzzle"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
