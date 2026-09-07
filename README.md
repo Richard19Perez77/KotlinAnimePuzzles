@@ -1,4 +1,10 @@
-`Kotlin Anime Puzzles`
+# Kotlin Anime Puzzles
+
+Android sliding-puzzle game written in Kotlin. Swap tiles to restore the anime image.
+
+## Run
+
+Open the project in Android Studio and run the `app` configuration.
 
 https://github.com/Richard19Perez77/KotlinAnimePuzzles/assets/58344001/4971954a-31c5-4c35-8a65-365eeffea5c9
 
